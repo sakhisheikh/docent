@@ -1,0 +1,18 @@
+{
+  "name": "docent",
+  "description": "Walks you through a change you did not write, stop by stop, with every claim tagged by evidence. Challenge anything and it runs the test or writes a probe to settle it. Quizzes you before review, then emits the artifacts a reviewer needs.",
+  "version": "0.1.0",
+  "author": {
+    "name": "Sakhi Mansoor"
+  },
+  "homepage": "https://github.com/sakhisheikh/docent",
+  "repository": "https://github.com/sakhisheikh/docent",
+  "license": "MIT",
+  "keywords": [
+    "code-review",
+    "walkthrough",
+    "comprehension",
+    "pull-request",
+    "ai-written-code"
+  ]
+}

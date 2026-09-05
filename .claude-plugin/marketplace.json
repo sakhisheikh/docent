@@ -1,0 +1,20 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "docent",
+  "description": "A guided walkthrough for changes you did not write",
+  "owner": {
+    "name": "Sakhi Mansoor"
+  },
+  "plugins": [
+    {
+      "name": "docent",
+      "description": "Walks you through a change you did not write, stop by stop, with every claim tagged by evidence. Challenge anything and it runs the test or writes a probe to settle it. Quizzes you before review, then emits the artifacts a reviewer needs.",
+      "author": {
+        "name": "Sakhi Mansoor"
+      },
+      "category": "development",
+      "source": ".",
+      "homepage": "https://github.com/sakhisheikh/docent"
+    }
+  ]
+}
