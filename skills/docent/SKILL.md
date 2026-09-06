@@ -65,10 +65,20 @@ as evidence; 1 lookup table, 157 lines"). Then wait, then walk.
 
 ## Phase 2: walk
 
+**Open the code in the author's editor at each stop.** If `$TERM_PROGRAM` is
+`vscode` and `code` is on PATH, run `code -g <file>:<line>` as the stop
+begins, so they read the real file with full context while you narrate. Same
+idea for other editors if detectable (`cursor -g`, `idea --line`). No editor
+detected: fall back to the permalink. Permalinks always go in the emitted
+artifacts regardless, because the reviewer is not in this editor.
+
+This is the difference between reading a diff and reading the code. Say which
+file you opened, so the author knows where to look.
+
 One stop per message, in this shape:
 
     STOP 3 of 6 - ensureStream (session.go:376)
-    <permalink pinned to the walked SHA>
+    opened in your editor; permalink: <pinned to the walked SHA>
 
     [<=20 lines of the code, only if seeing it beats describing it]
 
