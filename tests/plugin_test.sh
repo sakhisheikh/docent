@@ -48,6 +48,7 @@ done
 [ -f editor/vscode/extension.js ] || fail "extension entry point missing"
 python3 -c "import json; json.load(open('editor/vscode/package.json'))" || fail "extension manifest invalid"
 node --check editor/vscode/extension.js 2>/dev/null || fail "extension.js does not parse"
-grep -q "notes.json" "$skill" || fail "SKILL.md never mentions notes.json"
+grep -q "tour.json" "$skill" || fail "SKILL.md never mentions tour.json"
+grep -q "docent.play" editor/vscode/package.json || fail "play command not contributed"
 
 echo "ok: plugin_test"

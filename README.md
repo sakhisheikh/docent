@@ -25,42 +25,28 @@ a decision and the lines that are lookup tables, byte packing and plumbing. In
 the change that prompted this tool, 120 of 2,445 lines carried every decision.
 Finding that 5% is most of the value.
 
-**Walk.** The review happens in your editor, line by line. Install the
-companion extension and the notes arrive as hovers on your real code, exactly
-where your language server's would appear:
-
-> **There is no keyboard on the device until this package registers one, so
-> this number is an invention of this code rather than a discovery.**
->
-> (?) **inferred** SurfaceKeyboardDefault is invented here, while 257 and 1281
-> are enumerated by the device
-> &nbsp;&nbsp;*from the comment at hid.go:25-27, never observed on a device*
->
-> ---
-> **A reviewer will ask:** if the device assigns a different id than requested,
-> is the returned value used everywhere?
-
-Annotated lines are marked in the gutter, and lines resting only on `inferred`
-claims are marked differently, so the weak ground is visible before you hover.
-Your files are never modified: the notes live in `.docent/`, beside the repo.
-
-Without the extension it falls back to a diff view, your code on one side and
-an annotated copy on the other.
-
-The terminal carries the conversation and the claims. Every claim carries its
-evidence:
+**Walk.** It plays. The editor opens each file, scrolls to the lines being
+discussed, dims everything else, and narrates beside them. You watch. It moves
+on by itself and holds each step long enough to read it.
 
 ```
-CLAIMS
-  [tested]   a stray release is a no-op (TestTouchUpWithNothingDown)
-  [executed] 5 gestures share one stream (ran the script, 1 negotiation)
-  [read]     Close lifts a held contact before tearing the stream down
-  [inferred] repeated churn wedges the daemon, never reproduced on purpose
-             because recovery is a device reboot
+  [ your code, spotlit ]        │  4 of 6          playing · 1x · ~9 min
+                                │
+  s.receiver.Close()            │  teardownStream: the ordering that
+  ...        close first,       │  deadlocks if reversed
+             then wait          │
+  <-s.drainDone                 │  The receiver is closed before the drain
+                                │  is waited on. Reverse those two lines and
+                                │  it hangs forever, because closing the
+                                │  socket is the only thing that ends a
+                                │  blocked read.
+                                │
+                                │  READ  closing the receiver unblocks the drain
+                                │        the comment and ordering at :461
 ```
 
-That last line is the point. A walkthrough that cannot say "I have not verified
-this" is worse than none.
+Space to pause, arrows to step, up and down for speed. Pause and ask anything;
+the walk is there in the terminal.
 
 **Challenge.** Push on any claim and it runs the ladder: run the test that
 pins it; failing that write a probe and run it; failing that downgrade the
@@ -104,15 +90,22 @@ an admission.
 
 ## The editor extension
 
-Optional, and most of the point. It turns the notes into hovers.
+This is the player, and most of the point.
 
 ```
 cd editor/vscode
-cp -r . ~/.vscode/extensions/sakhisheikh.docent-0.1.0
+cp -r . ~/.vscode/extensions/sakhisheikh.docent-0.2.0
 ```
 
-Restart VS Code. Two commands: **Docent: reload review notes** and
-**Docent: show or hide review notes**.
+Restart VS Code, then **Docent: open the tour**.
+
+| | |
+|---|---|
+| cmd+alt+space | play or pause |
+| cmd+alt+left / right | previous, next |
+| cmd+alt+up / down | faster, slower |
+
+The status bar shows where you are and what is left.
 
 ## Requirements
 

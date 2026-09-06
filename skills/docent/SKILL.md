@@ -67,40 +67,40 @@ as evidence; 1 lookup table, 157 lines"). Then wait, then walk.
 
 **The review happens in the author's editor, line by line. Write it there.**
 
-Write `.docent/notes.json` in the target repo. If they have the docent VS Code
-extension installed, the notes become **hovers on the real code**: they read
-their own file, and your explanation appears where the language server's would.
-Annotated lines are marked, and a line whose claims are only `inferred` is
-marked differently, so weak ground is visible without hovering.
+Write `.docent/tour.json` in the target repo. With the docent extension
+installed the author watches: the editor opens each file, scrolls to the lines
+under discussion, dims everything else, and narrates beside them. It advances
+on its own until they pause.
 
-    {"version": 1, "files": {"ios/hid/hid.go": {
-      "26": {
-        "note": "There is no keyboard until this package registers one, so
-                 the number is an invention of this code, not a discovery.",
-        "claims": [{"text": "...", "class": "inferred", "evidence": "..."}],
-        "question": "what a reviewer will ask about this line"
-      }}}}
+    {"version": 1, "title": "PR 849", "steps": [{
+      "file": "ios/hid/session.go",
+      "focus": [439, 470],
+      "point": 461, "label": "close first, then wait",
+      "title": "the ordering that deadlocks if reversed",
+      "narration": "two to five sentences, spoken not written",
+      "claims": [{"text": "...", "class": "read", "evidence": "..."}],
+      "question": "what a reviewer will ask"
+    }]}
 
-Rewrite the file at each stop and the extension follows within a moment; it
-watches for changes. Notes live beside the repo, never inside a source file.
+`focus` is the range to spotlight, `point` the one line the label attaches to.
+Write the whole tour at triage so the author can play it end to end, then
+rewrite it as challenges change claims: the extension watches the file and
+picks up changes mid-play.
+
+They control it from the editor, not from you: play, pause, next, previous,
+faster, slower, on the status bar and on cmd+alt+space. Your job while it plays
+is to be ready for the moment they pause and ask something.
 
 No extension: fall back to `scripts/annotate.sh <file> <notes>`, which takes
 `line|comment` pairs and opens a diff of their code against an annotated copy.
-Line numbers stay aligned and the original is untouched. Say which you used.
+Line numbers stay aligned and the original is untouched.
 
-**Annotate the way a good reviewer marks up a file.** Not one note per stop:
-one per line that carries a decision, a constraint, a smell, or a question.
-Ten short notes beat one long one. Each says what a reviewer would say in the
-margin:
+**Narrate for the ear, not the page.** The author is watching, not reading, so
+each step gets two to five spoken sentences: what was decided here and why it
+could have gone otherwise. The `label` is the one line that sits against the
+code, six words at most.
 
-    28|the gate lives here; nothing above this line knows about a stream
-    55|these two are enumerated by the device, the third is invented here
-    91|this ordering deadlocks if reversed, close before you wait
-    140|nil here means written, not acted on
-
-Keep each note to a sentence. The terminal is where long explanations go.
-
-Two other movements, for when annotation is not the point:
+Two other movements, for when the tour is not the point:
 
 - `scripts/show.sh <file> <line>` just moves them to a line, for following a
   caller or a test mid-conversation.
@@ -115,7 +115,7 @@ The editor carries the code and the margin notes.
 
     STOP 3 of 6 - ensureStream (session.go:376)
     [####------] 3/6 - about 32 min left        speed 1x
-    6 notes in your editor, hover the marked lines
+    playing in your editor
 
     Two to six plain sentences: what was decided here and why it could have
     been otherwise.
@@ -137,10 +137,13 @@ The bar comes from `scripts/progress.sh <stop> <total> <lines-left>
 <claims-left> <inferred-left> <speed>`. Show it at every stop, so the author
 always knows what reviewing this properly is going to cost them.
 
+Transport is theirs, in the editor: the status bar and cmd+alt+space play and
+pause, arrows step, up and down change speed. In the terminal they can also say:
+
 | the author says | you do |
 |---|---|
-| `pause` (default) | stop after each stop and wait. Nothing advances without them. |
-| `play` | advance without waiting, one stop per message, until they say pause or a challenge lands |
+| `pause` | pause the tour, then wait |
+| `play` | resume the tour |
 | `speed 2x` | headlines: what was decided, the weakest claim, move on |
 | `speed 1x` | normal: the shape above |
 | `speed 0.5x` | deep: more code, every claim's evidence, the alternatives that were rejected |

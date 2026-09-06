@@ -8,7 +8,7 @@
   "plugins": [
     {
       "name": "docent",
-      "description": "Line by line review of a change you did not write. Its notes appear as hovers on your real code, every claim tagged with its evidence, and challenging one makes it run the test or write a probe. Playable, with a real estimate of what review will cost.",
+      "description": "Plays a change you did not write as a code tour. The editor scrolls itself, spotlights what is being discussed and narrates beside it while you watch. Every claim is tagged with its evidence, and challenging one makes it run the test or write a probe.",
       "author": {
         "name": "Sakhi Mansoor"
       },

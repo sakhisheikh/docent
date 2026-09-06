@@ -1,8 +1,8 @@
 {
   "name": "docent",
   "displayName": "Docent",
-  "description": "Shows docent's review notes as hovers on the code they are about",
-  "version": "0.1.0",
+  "description": "Plays a code tour: the editor scrolls itself, spotlights what is being discussed, and narrates beside it",
+  "version": "0.2.0",
   "publisher": "sakhisheikh",
   "license": "MIT",
   "engines": { "vscode": "^1.80.0" },
@@ -11,14 +11,21 @@
   "main": "./extension.js",
   "contributes": {
     "commands": [
-      {
-        "command": "docent.reload",
-        "title": "Docent: reload review notes"
-      },
-      {
-        "command": "docent.toggle",
-        "title": "Docent: show or hide review notes"
-      }
+      { "command": "docent.start",  "title": "Docent: open the tour" },
+      { "command": "docent.play",   "title": "Docent: play" },
+      { "command": "docent.pause",  "title": "Docent: pause" },
+      { "command": "docent.next",   "title": "Docent: next step" },
+      { "command": "docent.prev",   "title": "Docent: previous step" },
+      { "command": "docent.faster", "title": "Docent: faster" },
+      { "command": "docent.slower", "title": "Docent: slower" }
+    ],
+    "keybindings": [
+      { "command": "docent.play",   "key": "ctrl+alt+space", "mac": "cmd+alt+space" },
+      { "command": "docent.pause",  "key": "ctrl+alt+p",     "mac": "cmd+alt+p" },
+      { "command": "docent.next",   "key": "ctrl+alt+right", "mac": "cmd+alt+right" },
+      { "command": "docent.prev",   "key": "ctrl+alt+left",  "mac": "cmd+alt+left" },
+      { "command": "docent.faster", "key": "ctrl+alt+up",    "mac": "cmd+alt+up" },
+      { "command": "docent.slower", "key": "ctrl+alt+down",  "mac": "cmd+alt+down" }
     ]
   }
 }
