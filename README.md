@@ -25,8 +25,11 @@ a decision and the lines that are lookup tables, byte packing and plumbing. In
 the change that prompted this tool, 120 of 2,445 lines carried every decision.
 Finding that 5% is most of the value.
 
-**Walk.** Five to nine stops, one per message, why before how. Each stop is a
-permalink, a short explanation of what was decided and why it could have gone
+**Walk.** Five to nine stops, one per message, why before how. It drives your
+editor: each stop opens the real file at the real line, and it moves again
+whenever it points at something. You read the code with full context while it
+narrates, rather than squinting at pasted excerpts. Each stop is a short
+explanation of what was decided and why it could have gone
 another way, and the stop's claims. Every claim carries its evidence:
 
 ```
@@ -45,6 +48,18 @@ this" is worse than none.
 pins it; failing that write a probe and run it; failing that downgrade the
 claim honestly and keep it downgraded everywhere. Probes that prove something
 are offered back as regression tests.
+
+**Transport.** The walk is playable. `pause` is the default and nothing moves
+without you. `play` runs it through. `speed 2x` gives headlines, `speed 0.5x`
+goes deep, and either way the evidence is the same: skimming is allowed,
+hiding is not. Every stop carries the bar:
+
+```
+[####------] 3/6 - about 32 min left        speed 1x
+```
+
+That number is what a careful pass will actually cost you, from the volume of
+decision-carrying code and how many claims need arguing with.
 
 **Quiz.** Before it lets you ship, it asks the five questions your reviewer is
 most likely to ask. Reading is not the bar. Defending is.

@@ -94,6 +94,7 @@ sitting in this editor.
 One stop per message, in this shape:
 
     STOP 3 of 6 - ensureStream (session.go:376)
+    [####------] 3/6 - about 32 min left        speed 1x
     your editor is there now
 
     [<=20 lines, only if the shape matters more than the context]
@@ -110,8 +111,35 @@ One stop per message, in this shape:
 
 Permalinks are `<remote>/blob/<HEAD sha>/<path>#L<n>` from the facts output;
 no remote means plain `path:line`. Update `position` in state after each
-advance. Questions are answered at whatever depth the author wants - the stop
-does not advance until they say so.
+advance.
+
+### Transport
+
+The bar comes from `scripts/progress.sh <stop> <total> <lines-left>
+<claims-left> <inferred-left> <speed>`. Show it at every stop, so the author
+always knows what reviewing this properly is going to cost them.
+
+| the author says | you do |
+|---|---|
+| `pause` (default) | stop after each stop and wait. Nothing advances without them. |
+| `play` | advance without waiting, one stop per message, until they say pause or a challenge lands |
+| `speed 2x` | headlines: what was decided, the weakest claim, move on |
+| `speed 1x` | normal: the shape above |
+| `speed 0.5x` | deep: more code, every claim's evidence, the alternatives that were rejected |
+| `back` | previous stop, re-open its file |
+| `jump 4` | go to stop 4 |
+| `skip` | next stop, no narration, mark it `skipped` in state |
+
+Speed changes **how much you say**, never how much you verify. A claim's class
+is the same at 2x as at 0.5x, and 2x still shows the weakest claim at each
+stop: skimming is allowed, hiding is not.
+
+Store `speed` and `mode` in state so a resume comes back the way they left it.
+A challenge always pauses, whatever the mode: verification is the one thing
+that does not get skimmed.
+
+Questions are answered at whatever depth the author wants. In pause mode the
+stop does not advance until they say so.
 
 ## Phase 3: challenge (any time)
 

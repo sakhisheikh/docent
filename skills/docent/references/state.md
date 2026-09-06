@@ -15,6 +15,8 @@ before speaking. It is the truth; your memory of the walk is not.**
   "remote": "https://github.com/owner/repo",
   "skipped": "4 test files (+727) read as evidence; keys.go, 157 lines, lookup table",
   "position": 2,
+  "speed": 1,
+  "mode": "pause",
   "emitted": false,
   "stops": [
     {
@@ -43,7 +45,9 @@ before speaking. It is the truth; your memory of the walk is not.**
 }
 ```
 
-`status` is `pending`, `walked`, or `revisit`. `class` is one of `tested`,
+`speed` is a number (1 is normal, 2 skims, 0.5 goes deep) and `mode` is
+`pause` or `play`; both survive a resume so the walk comes back as it was
+left. `status` is `pending`, `walked`, `skipped`, or `revisit`. `class` is one of `tested`,
 `executed`, `read`, `inferred`. `answered` is `correct`, `missed`, or
 `skipped`.
 

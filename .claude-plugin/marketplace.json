@@ -8,7 +8,7 @@
   "plugins": [
     {
       "name": "docent",
-      "description": "Walks you through a change you did not write, stop by stop, with every claim tagged by evidence. Challenge anything and it runs the test or writes a probe to settle it. Quizzes you before review, then emits the artifacts a reviewer needs.",
+      "description": "Walks you through a change you did not write. Drives your editor stop by stop, tags every claim with its evidence, and runs the test or writes a probe when you challenge one. Playable with pause, speed and a real estimate of what review will cost.",
       "author": {
         "name": "Sakhi Mansoor"
       },
