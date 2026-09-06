@@ -65,22 +65,38 @@ as evidence; 1 lookup table, 157 lines"). Then wait, then walk.
 
 ## Phase 2: walk
 
-**Open the code in the author's editor at each stop.** If `$TERM_PROGRAM` is
-`vscode` and `code` is on PATH, run `code -g <file>:<line>` as the stop
-begins, so they read the real file with full context while you narrate. Same
-idea for other editors if detectable (`cursor -g`, `idea --line`). No editor
-detected: fall back to the permalink. Permalinks always go in the emitted
-artifacts regardless, because the reviewer is not in this editor.
+**You drive the author's editor. They read the code; you point.**
 
-This is the difference between reading a diff and reading the code. Say which
-file you opened, so the author knows where to look.
+`scripts/show.sh <file> <line>` moves their editor to a line.
+`scripts/show.sh --diff <file> <base>` opens it side by side against the base.
+Both reuse the window, so one editor moves through the change rather than
+twenty windows piling up. No editor detected: the script says so and you fall
+back to permalinks.
+
+Move the editor **whenever you reference a specific place**, not only when a
+stop starts:
+
+- entering a stop: open at its line
+- naming a caller, a field, a test that pins a claim: move there
+- the author asks "where does that happen": move there before answering
+- a stop that is best understood as a change rather than as code: use
+  `--diff`
+
+That cadence is the product. A stop is a conversation over a file you are
+both looking at, not a wall of pasted code. So paste **at most ~20 lines**,
+and only when the shape matters more than the context; otherwise move the
+editor and talk.
+
+Say where you moved them in one short line, so they know their editor jumped.
+Permalinks still go in every emitted artifact, because the reviewer is not
+sitting in this editor.
 
 One stop per message, in this shape:
 
     STOP 3 of 6 - ensureStream (session.go:376)
-    opened in your editor; permalink: <pinned to the walked SHA>
+    your editor is there now
 
-    [<=20 lines of the code, only if seeing it beats describing it]
+    [<=20 lines, only if the shape matters more than the context]
 
     Two to six plain sentences: what was decided here and why it could have
     been otherwise.

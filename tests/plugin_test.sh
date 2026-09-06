@@ -25,12 +25,14 @@ grep -q '^description: ' "$skill"           || fail "frontmatter description"
 # Every referenced file exists, so the agent never reaches a dead path midwalk.
 for ref in references/evidence.md references/artifact-style.md references/state.md \
            templates/reading-order.md templates/claims.md templates/post.md \
-           scripts/facts.sh; do
+           scripts/facts.sh scripts/show.sh; do
   [ -f "skills/docent/$ref" ] || fail "missing $ref"
   grep -q "$(basename "$ref")" "$skill" || fail "$ref exists but SKILL.md never points at it"
 done
 
-[ -x skills/docent/scripts/facts.sh ] || fail "facts.sh not executable"
+for x in facts.sh show.sh; do
+  [ -x "skills/docent/scripts/$x" ] || fail "$x not executable"
+done
 
 # Size limits: a skill nobody finishes reading does not get followed.
 lines=$(wc -l < "$skill")
