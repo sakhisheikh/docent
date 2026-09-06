@@ -67,12 +67,26 @@ as evidence; 1 lookup table, 157 lines"). Then wait, then walk.
 
 **The review happens in the author's editor, line by line. Write it there.**
 
-For each stop, write a notes file of `line|comment` pairs and run
-`scripts/annotate.sh <file> <notes>`. Their editor opens a diff: their real
-code on the left, the same code with your commentary appended to the relevant
-lines on the right. Line numbers stay identical, and the editor's change
-highlighting points at exactly what you are talking about. The original file
-is never modified.
+Write `.docent/notes.json` in the target repo. If they have the docent VS Code
+extension installed, the notes become **hovers on the real code**: they read
+their own file, and your explanation appears where the language server's would.
+Annotated lines are marked, and a line whose claims are only `inferred` is
+marked differently, so weak ground is visible without hovering.
+
+    {"version": 1, "files": {"ios/hid/hid.go": {
+      "26": {
+        "note": "There is no keyboard until this package registers one, so
+                 the number is an invention of this code, not a discovery.",
+        "claims": [{"text": "...", "class": "inferred", "evidence": "..."}],
+        "question": "what a reviewer will ask about this line"
+      }}}}
+
+Rewrite the file at each stop and the extension follows within a moment; it
+watches for changes. Notes live beside the repo, never inside a source file.
+
+No extension: fall back to `scripts/annotate.sh <file> <notes>`, which takes
+`line|comment` pairs and opens a diff of their code against an annotated copy.
+Line numbers stay aligned and the original is untouched. Say which you used.
 
 **Annotate the way a good reviewer marks up a file.** Not one note per stop:
 one per line that carries a decision, a constraint, a smell, or a question.
@@ -101,7 +115,7 @@ The editor carries the code and the margin notes.
 
     STOP 3 of 6 - ensureStream (session.go:376)
     [####------] 3/6 - about 32 min left        speed 1x
-    annotated in your editor, 6 notes
+    6 notes in your editor, hover the marked lines
 
     Two to six plain sentences: what was decided here and why it could have
     been otherwise.

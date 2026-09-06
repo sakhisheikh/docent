@@ -8,7 +8,7 @@
   "plugins": [
     {
       "name": "docent",
-      "description": "Line by line review of a change you did not write. Writes its margin notes into your editor beside the real code, tags every claim with its evidence, and runs the test or writes a probe when you challenge one. Playable, with a real estimate of what review will cost.",
+      "description": "Line by line review of a change you did not write. Its notes appear as hovers on your real code, every claim tagged with its evidence, and challenging one makes it run the test or write a probe. Playable, with a real estimate of what review will cost.",
       "author": {
         "name": "Sakhi Mansoor"
       },

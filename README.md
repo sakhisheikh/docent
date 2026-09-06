@@ -25,21 +25,27 @@ a decision and the lines that are lookup tables, byte packing and plumbing. In
 the change that prompted this tool, 120 of 2,445 lines carried every decision.
 Finding that 5% is most of the value.
 
-**Walk.** The review happens in your editor, line by line. Each stop opens a
-diff: your real code on the left, the same code with the reviewer's margin
-notes written into it on the right.
+**Walk.** The review happens in your editor, line by line. Install the
+companion extension and the notes arrive as hovers on your real code, exactly
+where your language server's would appear:
 
-```go
-// needs a media stream to be accepted, which Session owns.  // << the whole PR
-                                                             //    is decided here
-SurfaceMainTouchscreen uint64 = 257                          // << the device
-                                                             //    enumerates this
-SurfaceKeyboardDefault uint64 = 0x100002001                  // << this one is
-                                                             //    ours, invented
-```
+> **There is no keyboard on the device until this package registers one, so
+> this number is an invention of this code rather than a discovery.**
+>
+> (?) **inferred** SurfaceKeyboardDefault is invented here, while 257 and 1281
+> are enumerated by the device
+> &nbsp;&nbsp;*from the comment at hid.go:25-27, never observed on a device*
+>
+> ---
+> **A reviewer will ask:** if the device assigns a different id than requested,
+> is the returned value used everywhere?
 
-Line numbers are untouched and so is your file. The editor's own diff
-highlighting marks exactly the lines worth stopping on.
+Annotated lines are marked in the gutter, and lines resting only on `inferred`
+claims are marked differently, so the weak ground is visible before you hover.
+Your files are never modified: the notes live in `.docent/`, beside the repo.
+
+Without the extension it falls back to a diff view, your code on one side and
+an annotated copy on the other.
 
 The terminal carries the conversation and the claims. Every claim carries its
 evidence:
@@ -95,6 +101,18 @@ human pushed back on it.
 Docent assumes nobody will push back. So it grades its own claims, defaults
 downward, and makes "I could not verify this" a first-class output rather than
 an admission.
+
+## The editor extension
+
+Optional, and most of the point. It turns the notes into hovers.
+
+```
+cd editor/vscode
+cp -r . ~/.vscode/extensions/sakhisheikh.docent-0.1.0
+```
+
+Restart VS Code. Two commands: **Docent: reload review notes** and
+**Docent: show or hide review notes**.
 
 ## Requirements
 

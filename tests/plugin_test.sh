@@ -42,4 +42,12 @@ for r in skills/docent/references/*.md; do
   [ "$n" -lt 120 ] || fail "$r is $n lines, limit 120"
 done
 
+# The extension is part of the product, so its manifest and entry point are
+# checked here rather than discovered broken at install time.
+[ -f editor/vscode/package.json ] || fail "extension manifest missing"
+[ -f editor/vscode/extension.js ] || fail "extension entry point missing"
+python3 -c "import json; json.load(open('editor/vscode/package.json'))" || fail "extension manifest invalid"
+node --check editor/vscode/extension.js 2>/dev/null || fail "extension.js does not parse"
+grep -q "notes.json" "$skill" || fail "SKILL.md never mentions notes.json"
+
 echo "ok: plugin_test"

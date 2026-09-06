@@ -1,0 +1,24 @@
+{
+  "name": "docent",
+  "displayName": "Docent",
+  "description": "Shows docent's review notes as hovers on the code they are about",
+  "version": "0.1.0",
+  "publisher": "sakhisheikh",
+  "license": "MIT",
+  "engines": { "vscode": "^1.80.0" },
+  "categories": ["Other"],
+  "activationEvents": ["onStartupFinished"],
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "docent.reload",
+        "title": "Docent: reload review notes"
+      },
+      {
+        "command": "docent.toggle",
+        "title": "Docent: show or hide review notes"
+      }
+    ]
+  }
+}
