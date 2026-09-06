@@ -1,7 +1,7 @@
 {
   "name": "docent",
-  "description": "Walks you through a change you did not write. Drives your editor stop by stop, tags every claim with its evidence, and runs the test or writes a probe when you challenge one. Playable with pause, speed and a real estimate of what review will cost.",
-  "version": "0.4.0",
+  "description": "Line by line review of a change you did not write. Writes its margin notes into your editor beside the real code, tags every claim with its evidence, and runs the test or writes a probe when you challenge one. Playable, with a real estimate of what review will cost.",
+  "version": "0.5.0",
   "author": {
     "name": "Sakhi Mansoor"
   },

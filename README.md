@@ -25,12 +25,24 @@ a decision and the lines that are lookup tables, byte packing and plumbing. In
 the change that prompted this tool, 120 of 2,445 lines carried every decision.
 Finding that 5% is most of the value.
 
-**Walk.** Five to nine stops, one per message, why before how. It drives your
-editor: each stop opens the real file at the real line, and it moves again
-whenever it points at something. You read the code with full context while it
-narrates, rather than squinting at pasted excerpts. Each stop is a short
-explanation of what was decided and why it could have gone
-another way, and the stop's claims. Every claim carries its evidence:
+**Walk.** The review happens in your editor, line by line. Each stop opens a
+diff: your real code on the left, the same code with the reviewer's margin
+notes written into it on the right.
+
+```go
+// needs a media stream to be accepted, which Session owns.  // << the whole PR
+                                                             //    is decided here
+SurfaceMainTouchscreen uint64 = 257                          // << the device
+                                                             //    enumerates this
+SurfaceKeyboardDefault uint64 = 0x100002001                  // << this one is
+                                                             //    ours, invented
+```
+
+Line numbers are untouched and so is your file. The editor's own diff
+highlighting marks exactly the lines worth stopping on.
+
+The terminal carries the conversation and the claims. Every claim carries its
+evidence:
 
 ```
 CLAIMS

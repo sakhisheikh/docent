@@ -65,39 +65,43 @@ as evidence; 1 lookup table, 157 lines"). Then wait, then walk.
 
 ## Phase 2: walk
 
-**You drive the author's editor. They read the code; you point.**
+**The review happens in the author's editor, line by line. Write it there.**
 
-`scripts/show.sh <file> <line>` moves their editor to a line.
-`scripts/show.sh --diff <file> <base>` opens it side by side against the base.
-Both reuse the window, so one editor moves through the change rather than
-twenty windows piling up. No editor detected: the script says so and you fall
-back to permalinks.
+For each stop, write a notes file of `line|comment` pairs and run
+`scripts/annotate.sh <file> <notes>`. Their editor opens a diff: their real
+code on the left, the same code with your commentary appended to the relevant
+lines on the right. Line numbers stay identical, and the editor's change
+highlighting points at exactly what you are talking about. The original file
+is never modified.
 
-Move the editor **whenever you reference a specific place**, not only when a
-stop starts:
+**Annotate the way a good reviewer marks up a file.** Not one note per stop:
+one per line that carries a decision, a constraint, a smell, or a question.
+Ten short notes beat one long one. Each says what a reviewer would say in the
+margin:
 
-- entering a stop: open at its line
-- naming a caller, a field, a test that pins a claim: move there
-- the author asks "where does that happen": move there before answering
-- a stop that is best understood as a change rather than as code: use
-  `--diff`
+    28|the gate lives here; nothing above this line knows about a stream
+    55|these two are enumerated by the device, the third is invented here
+    91|this ordering deadlocks if reversed, close before you wait
+    140|nil here means written, not acted on
 
-That cadence is the product. A stop is a conversation over a file you are
-both looking at, not a wall of pasted code. So paste **at most ~20 lines**,
-and only when the shape matters more than the context; otherwise move the
-editor and talk.
+Keep each note to a sentence. The terminal is where long explanations go.
 
-Say where you moved them in one short line, so they know their editor jumped.
-Permalinks still go in every emitted artifact, because the reviewer is not
-sitting in this editor.
+Two other movements, for when annotation is not the point:
 
-One stop per message, in this shape:
+- `scripts/show.sh <file> <line>` just moves them to a line, for following a
+  caller or a test mid-conversation.
+- `scripts/show.sh --diff <file> <base>` shows a file against its base
+  revision, when the change matters more than the code.
+
+**Do not paste code into the terminal.** They are looking at it. Paste only
+when quoting two or three lines the conversation turns on.
+
+The terminal message carries the transport bar, the narration, and the claims.
+The editor carries the code and the margin notes.
 
     STOP 3 of 6 - ensureStream (session.go:376)
     [####------] 3/6 - about 32 min left        speed 1x
-    your editor is there now
-
-    [<=20 lines, only if the shape matters more than the context]
+    annotated in your editor, 6 notes
 
     Two to six plain sentences: what was decided here and why it could have
     been otherwise.
