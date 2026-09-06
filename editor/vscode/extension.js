@@ -214,20 +214,28 @@ function activate(context) {
   const cmd = (id, fn) => context.subscriptions.push(vscode.commands.registerCommand(id, fn));
 
   cmd('docent.start', start);
+  const setPlaying = (on) => {
+    playing = on;
+    clearTimeout(timer);
+    updateStatus();
+    if (tour.steps[index]) showNarration(tour.steps[index]);
+    if (on) scheduleNext();
+  };
+  // One key toggles, so there is nothing to remember mid-tour.
   cmd('docent.play', async () => {
     if (!tour.steps.length && !loadTour()) return;
     if (!panel) await start();
-    playing = true; updateStatus(); showNarration(tour.steps[index]); scheduleNext();
+    setPlaying(!playing);
   });
-  cmd('docent.pause', () => { playing = false; clearTimeout(timer); updateStatus(); showNarration(tour.steps[index]); });
+  cmd('docent.pause', () => setPlaying(false));
   cmd('docent.next', async () => {
     if (index < tour.steps.length - 1) { index++; await render(); if (playing) scheduleNext(); }
   });
   cmd('docent.prev', async () => {
     if (index > 0) { index--; await render(); if (playing) scheduleNext(); }
   });
-  cmd('docent.faster', () => { speed = Math.min(4, speed * 2); updateStatus(); showNarration(tour.steps[index]); if (playing) scheduleNext(); });
-  cmd('docent.slower', () => { speed = Math.max(0.25, speed / 2); updateStatus(); showNarration(tour.steps[index]); if (playing) scheduleNext(); });
+  cmd('docent.faster', () => { speed = Math.min(4, speed * 2); setPlaying(playing); });
+  cmd('docent.slower', () => { speed = Math.max(0.25, speed / 2); setPlaying(playing); });
 
   context.subscriptions.push(status, dim, spot, cursorLine);
 }

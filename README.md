@@ -99,13 +99,16 @@ cp -r . ~/.vscode/extensions/sakhisheikh.docent-0.2.0
 
 Restart VS Code, then **Docent: open the tour**.
 
+Or just click the status bar item, which toggles play and pause and shows
+where you are.
+
 | | |
 |---|---|
-| cmd+alt+space | play or pause |
-| cmd+alt+left / right | previous, next |
-| cmd+alt+up / down | faster, slower |
+| ctrl+alt+space | play or pause |
+| ctrl+alt+[ ctrl+alt+] | previous, next |
+| ctrl+alt+- ctrl+alt+= | slower, faster |
 
-The status bar shows where you are and what is left.
+macOS claims cmd+alt+space for Finder search, which is why these use ctrl.
 
 ## Requirements
 

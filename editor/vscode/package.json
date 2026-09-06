@@ -2,30 +2,77 @@
   "name": "docent",
   "displayName": "Docent",
   "description": "Plays a code tour: the editor scrolls itself, spotlights what is being discussed, and narrates beside it",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "publisher": "sakhisheikh",
   "license": "MIT",
-  "engines": { "vscode": "^1.80.0" },
-  "categories": ["Other"],
-  "activationEvents": ["onStartupFinished"],
+  "engines": {
+    "vscode": "^1.80.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
   "main": "./extension.js",
   "contributes": {
     "commands": [
-      { "command": "docent.start",  "title": "Docent: open the tour" },
-      { "command": "docent.play",   "title": "Docent: play" },
-      { "command": "docent.pause",  "title": "Docent: pause" },
-      { "command": "docent.next",   "title": "Docent: next step" },
-      { "command": "docent.prev",   "title": "Docent: previous step" },
-      { "command": "docent.faster", "title": "Docent: faster" },
-      { "command": "docent.slower", "title": "Docent: slower" }
+      {
+        "command": "docent.start",
+        "title": "Docent: open the tour"
+      },
+      {
+        "command": "docent.play",
+        "title": "Docent: play"
+      },
+      {
+        "command": "docent.pause",
+        "title": "Docent: pause"
+      },
+      {
+        "command": "docent.next",
+        "title": "Docent: next step"
+      },
+      {
+        "command": "docent.prev",
+        "title": "Docent: previous step"
+      },
+      {
+        "command": "docent.faster",
+        "title": "Docent: faster"
+      },
+      {
+        "command": "docent.slower",
+        "title": "Docent: slower"
+      }
     ],
     "keybindings": [
-      { "command": "docent.play",   "key": "ctrl+alt+space", "mac": "cmd+alt+space" },
-      { "command": "docent.pause",  "key": "ctrl+alt+p",     "mac": "cmd+alt+p" },
-      { "command": "docent.next",   "key": "ctrl+alt+right", "mac": "cmd+alt+right" },
-      { "command": "docent.prev",   "key": "ctrl+alt+left",  "mac": "cmd+alt+left" },
-      { "command": "docent.faster", "key": "ctrl+alt+up",    "mac": "cmd+alt+up" },
-      { "command": "docent.slower", "key": "ctrl+alt+down",  "mac": "cmd+alt+down" }
+      {
+        "command": "docent.play",
+        "key": "ctrl+alt+space",
+        "mac": "ctrl+alt+space",
+        "when": "!inputFocus"
+      },
+      {
+        "command": "docent.next",
+        "key": "ctrl+alt+]",
+        "mac": "ctrl+alt+]"
+      },
+      {
+        "command": "docent.prev",
+        "key": "ctrl+alt+[",
+        "mac": "ctrl+alt+["
+      },
+      {
+        "command": "docent.faster",
+        "key": "ctrl+alt+=",
+        "mac": "ctrl+alt+="
+      },
+      {
+        "command": "docent.slower",
+        "key": "ctrl+alt+-",
+        "mac": "ctrl+alt+-"
+      }
     ]
   }
 }
