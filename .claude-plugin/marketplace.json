@@ -8,7 +8,7 @@
   "plugins": [
     {
       "name": "docent",
-      "description": "Plays a change you did not write as a code tour. The editor scrolls itself, spotlights what is being discussed and narrates beside it while you watch. Every claim is tagged with its evidence, and challenging one makes it run the test or write a probe.",
+      "description": "Generates a review tour of a change you did not write, commits it to the branch, and plays it in your editor: the code scrolls itself, each decision is spotlit, and every claim carries its evidence. Reviewers play the same tour.",
       "author": {
         "name": "Sakhi Mansoor"
       },

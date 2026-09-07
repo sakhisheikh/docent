@@ -112,6 +112,7 @@ function push() {
       claims: step.claims || [],
       question: step.question || '',
       where: step.file ? `${step.file}:${step.focus ? step.focus[0] : 1}` : '',
+      kind: step.kind || 'decision',
     },
   });
 }
@@ -216,7 +217,8 @@ window.addEventListener('message', (ev) => {
   }
 
   $('title').textContent = s.step.title;
-  $('where').textContent = s.step.where;
+  $('where').textContent = s.step.where +
+    (s.step.kind && s.step.kind !== 'decision' ? '   ·   ' + s.step.kind : '');
   $('narration').textContent = s.step.narration;
   const claims = (s.step.claims || []).slice().sort(
     (a,b) => order.indexOf(a.class) - order.indexOf(b.class));
@@ -315,7 +317,19 @@ function activate(context) {
     const reload = async () => { if (loadTour()) { await render(); if (playing) schedule(); } };
     w.onDidChange(reload); w.onDidCreate(reload);
     context.subscriptions.push(w);
-    if (loadTour() && tour.steps.length) updateStatus();
+    if (loadTour() && tour.steps.length) {
+      updateStatus();
+      const key = 'docent.announced';
+      const seen = context.globalState.get(key, []);
+      const id = r + ':' + tour.steps.length;
+      if (!seen.includes(id)) {
+        context.globalState.update(key, seen.concat([id]).slice(-40));
+        vscode.window.showInformationMessage(
+          `Docent: this branch ships a ${tour.steps.length} step tour of the change`,
+          'Play it'
+        ).then((pick) => { if (pick === 'Play it') vscode.commands.executeCommand('docent.play'); });
+      }
+    }
   }
 
   const cmd = (id, fn) => context.subscriptions.push(vscode.commands.registerCommand(id, fn));

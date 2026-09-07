@@ -13,5 +13,9 @@ the code's. No arrows or dashes inside label text.}
 {One paragraph on the decision most worth challenging, and the constraint that
 makes it necessary.}
 
-<!-- Then the contents of reading-order.md, or a link to it if the repo keeps
-walkthrough/ in version control. -->
+**There is a tour of this change in the branch.** Open it in VS Code with the
+docent extension and it walks the diff, spotlighting each decision and saying
+what is proven and what is not. Or read walkthrough/claims.md for the same
+claims without the editor.
+
+<!-- Then the reading order, if one was written for reviewers with no editor. -->

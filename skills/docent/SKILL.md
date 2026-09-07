@@ -32,7 +32,9 @@ is `inferred`.
    a base, a range, or a PR URL (resolve a PR URL to its branch with `gh`).
 2. If `.docent/state.json` exists, follow the resume rules in
    `references/state.md` instead of starting fresh.
-3. First run in a repo: offer to add `.docent/` to its `.gitignore`.
+3. First run in a repo: offer to add `.docent/state.json` to its `.gitignore`.
+   **Not the whole directory.** `tour.json` is the artifact reviewers play, so
+   it belongs in the branch; `state.json` is this author's private progress.
 
 ## Phase 1: triage
 
@@ -45,8 +47,15 @@ line into two piles:
 - **mechanical**: lookup tables, byte packing, generated code, plumbing,
   renames, and tests (tests become evidence, not stops).
 
-Build **5 to 9 stops** from the decision-carrying pile, ordered why before
-how:
+**Every file in the diff gets at least one step.** Depth follows decision
+density, not line count: a lookup table earns twenty seconds saying what it is
+and why there is nothing to decide, while a lifecycle earns several steps. A
+reviewer should finish having seen the whole change, not a curated slice of it.
+
+Mark each step's `kind`: `decision`, `mechanical`, or `test`. Mechanical and
+test steps get shorter narration, so the player holds them for less time.
+
+Order the decision-carrying steps why before how:
 
 1. the thing that explains why the change exists (often a package doc or the
    core type),
@@ -55,13 +64,18 @@ how:
 4. lifecycle and teardown,
 5. the surprises: contracts a caller would get wrong.
 
-Cap at 9. In one measured real case, 120 of 2,445 lines carried every
-decision; finding that 5% is the entire value of triage.
+Then the mechanical files, then the tests last, because the tests are the
+evidence for everything above them.
 
-Write the state file (schema in `references/state.md`) before walking.
-Present the plan in one message: the stops as a numbered list with file:line,
-plus a named summary of everything skipped ("4 test files, +727 lines, used
-as evidence; 1 lookup table, 157 lines"). Then wait, then walk.
+Expect roughly two steps per hundred decision-carrying lines and one per
+mechanical file. A real 1,754 line change came to 22 steps across 9 files: 12
+decisions, 6 mechanical, 4 test. In that same change 120 lines carried every
+decision, and finding those is still the point; showing the rest briefly is
+what makes it a review rather than a highlight reel.
+
+Write `.docent/tour.json` and the state file before walking. Present the plan
+in one message: the steps as a numbered list with file:line, grouped by file,
+with each file's step count. Then wait, then walk.
 
 ## Phase 2: walk
 
@@ -196,16 +210,28 @@ misses outstanding; misses are then recorded in the artifacts.
 
 ## Phase 5: emit
 
-Only at the end, and from state, never from memory:
+The tour is the deliverable. Everything else supports it.
 
-1. `walkthrough/reading-order.md` from `templates/reading-order.md`
-2. `walkthrough/claims.md` from `templates/claims.md`
-3. `walkthrough/post.md` from `templates/post.md`, including a mermaid
-   diagram of the main lifecycle in plain-English labels
+1. **Commit `.docent/tour.json` to the branch** (ask first). Any reviewer who
+   checks out the branch and has the extension can then play the same
+   walkthrough, at their own speed, stopping where they want. That is the point
+   of the whole exercise: the walk you just had is the walk they get.
+2. `walkthrough/claims.md` from `templates/claims.md`, for reviewers reading on
+   the web rather than in an editor.
+3. `walkthrough/post.md` from `templates/post.md`: a lifecycle diagram, the
+   decision most worth challenging, and one line telling reviewers the tour is
+   in the branch and how to play it.
+
+`walkthrough/reading-order.md` from `templates/reading-order.md` is optional
+now, and worth writing only when a reviewer is likely to have no editor.
 
 Every artifact obeys `references/artifact-style.md`, and every claim appears
-with its class exactly as the walk left it. Ask before posting `post.md`
-anywhere. Set `emitted: true` in state.
+with the class the walk left it at. Ask before posting `post.md` anywhere. Set
+`emitted: true` in state.
+
+**A committed tour is a review artifact, so it is held to the same standard as
+the code.** No claim above its evidence, no step that restates its own title,
+and the steps a reviewer most needs are the ones on weakest ground.
 
 ## Red flags - stop and reconsider
 

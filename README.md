@@ -21,9 +21,11 @@ Then, on a branch you are about to send for review:
 ## What it does
 
 **Triage.** It diffs the branch and sorts it into the lines where someone made
-a decision and the lines that are lookup tables, byte packing and plumbing. In
-the change that prompted this tool, 120 of 2,445 lines carried every decision.
-Finding that 5% is most of the value.
+a decision and the lines that are lookup tables, byte packing and plumbing.
+Every file gets at least one step, but depth follows decision density: a lookup
+table earns twenty seconds saying why there is nothing to decide in it, a
+lifecycle earns several steps. A real 1,754 line change came to 22 steps across
+9 files.
 
 **Walk.** It plays. The editor opens each file, scrolls to the lines being
 discussed, dims everything else, and narrates beside them with a transport you
@@ -70,6 +72,17 @@ most likely to ask. Reading is not the bar. Defending is.
 
 **Emit.** A reading order with permalinks, the claims table with evidence, and
 a PR comment with a lifecycle diagram. It asks before posting anything.
+
+## The tour travels with the branch
+
+`.docent/tour.json` is committed. Anyone who checks out the branch and has the
+extension gets a notification that the change ships a tour, and can play the
+same walkthrough you had, at their own speed, stopping wherever they like.
+
+That is the point. A reading order in a pull request comment is a list of
+links someone skims. A tour is the review, handed over.
+
+Only `state.json` is gitignored, because that is your own progress through it.
 
 ## Why the evidence classes exist
 
