@@ -49,6 +49,20 @@ done
 python3 -c "import json; json.load(open('editor/vscode/package.json'))" || fail "extension manifest invalid"
 node --check editor/vscode/extension.js 2>/dev/null || fail "extension.js does not parse"
 grep -q "tour.json" "$skill" || fail "SKILL.md never mentions tour.json"
+
+# Webview APIs live on panel.webview, not on the panel. Getting this wrong
+# throws at runtime before any HTML is written, and node --check cannot see it.
+ext=editor/vscode/extension.js
+for api in onDidReceiveMessage postMessage asWebviewUri; do
+  grep -qE "panel\.$api" "$ext" && fail "panel.$api should be panel.webview.$api"
+done
+# And these live on the panel, not the webview.
+for api in onDidDispose reveal dispose; do
+  grep -qE "panel\.webview\.$api" "$ext" && fail "panel.webview.$api should be panel.$api"
+done
+# A scripted webview needs enableScripts, or the transport is inert.
+grep -q "enableScripts: true" "$ext" || fail "webview scripts disabled, transport would not respond"
+grep -q "acquireVsCodeApi" "$ext"    || fail "webview never acquires the api"
 grep -q "docent.play" editor/vscode/package.json || fail "play command not contributed"
 
 echo "ok: plugin_test"

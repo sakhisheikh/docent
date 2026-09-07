@@ -268,7 +268,9 @@ async function openPanel() {
     { enableScripts: true, retainContextWhenHidden: true }
   );
   chromeSent = false;
-  panel.onDidReceiveMessage(async (m) => {
+  // onDidReceiveMessage is on the webview, not the panel. onDidDispose is on
+  // the panel. Getting that wrong throws before the HTML is ever written.
+  panel.webview.onDidReceiveMessage(async (m) => {
     if (m.type === 'toggle') setPlaying(!playing);
     else if (m.type === 'next') await goto(index + 1);
     else if (m.type === 'prev') await goto(index - 1);

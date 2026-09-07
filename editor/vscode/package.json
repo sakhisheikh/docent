@@ -2,7 +2,7 @@
   "name": "docent",
   "displayName": "Docent",
   "description": "Plays a change you did not write as a code tour, with a transport you can seek",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "publisher": "sakhisheikh",
   "license": "MIT",
   "engines": {
