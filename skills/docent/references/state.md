@@ -45,6 +45,10 @@ before speaking. It is the truth; your memory of the walk is not.**
 }
 ```
 
+A step's `anchor` is what keeps it pointing at the right code. On a resume,
+prefer relocating by anchor over trusting `focus`, and reset a step to
+`pending` only when its anchor cannot be found at all.
+
 `speed` is a number (1 is normal, 2 skims, 0.5 goes deep) and `mode` is
 `pause` or `play`; both survive a resume so the walk comes back as it was
 left. `status` is `pending`, `walked`, `skipped`, or `revisit`. `class` is one of `tested`,

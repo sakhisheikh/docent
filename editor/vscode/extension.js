@@ -73,6 +73,11 @@ async function render() {
   });
 
   const last = doc.lineCount - 1;
+  const shift = relocate(doc, step);
+  if (shift !== 0 && step.focus) {
+    step.focus = [step.focus[0] + shift, step.focus[1] + shift];
+    if (step.point) step.point += shift;
+  }
   const from = Math.max(0, Math.min(last, (step.focus ? step.focus[0] : 1) - 1));
   const to = Math.max(from, Math.min(last, (step.focus ? step.focus[1] : from + 1) - 1));
   const focus = new vscode.Range(from, 0, to, doc.lineAt(to).text.length);
@@ -91,6 +96,29 @@ async function render() {
 
   editor.revealRange(focus, vscode.TextEditorRevealType.InCenter);
   push();
+}
+
+// How far the anchor has moved since the tour was written. Returns 0 when there
+// is no anchor, when it is still where the tour says, or when it cannot be
+// found at all: a wrong highlight is better than jumping somewhere arbitrary,
+// and driftedAway reports the last case so the panel can say so.
+let driftedAway = false;
+
+function relocate(doc, step) {
+  driftedAway = false;
+  if (!step.anchor || !step.point) return 0;
+  const at = step.point - 1;
+  const has = (n) => n >= 0 && n <= doc.lineCount - 1 &&
+    doc.lineAt(n).text.includes(step.anchor);
+  if (has(at)) return 0;
+
+  // Search outwards, so the nearest match wins when a snippet repeats.
+  for (let d = 1; d <= 200; d++) {
+    if (has(at - d)) return -d;
+    if (has(at + d)) return d;
+  }
+  driftedAway = true;
+  return 0;
 }
 
 // State goes to the webview as a message rather than fresh HTML, so the
@@ -115,6 +143,7 @@ function push() {
       question: step.question || '',
       where: step.file ? `${step.file}:${step.focus ? step.focus[0] : 1}` : '',
       kind: step.kind || 'decision',
+      drifted: driftedAway,
     },
   });
 }
@@ -273,7 +302,8 @@ window.addEventListener('message', (ev) => {
   cur = s;
   $('title').textContent = s.step.title;
   $('where').textContent = s.step.where +
-    (s.step.kind && s.step.kind !== 'decision' ? '   ·   ' + s.step.kind : '');
+    (s.step.kind && s.step.kind !== 'decision' ? '   ·   ' + s.step.kind : '') +
+    (s.step.drifted ? '   ·   anchor not found, the highlight may be stale' : '');
 
   $('narration').innerHTML = '<p>' + esc(s.step.narration) +
     '<button class="ed" data-f="narration" title="edit">&#9998;</button></p>';

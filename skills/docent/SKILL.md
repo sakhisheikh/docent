@@ -96,7 +96,13 @@ on its own until they pause.
       "question": "what a reviewer will ask"
     }]}
 
-`focus` is the range to spotlight, `point` the one line the label attaches to.
+`focus` is the range to spotlight, `point` the line the label attaches to, and
+`anchor` is a snippet of the code on that line. **Always write an anchor.**
+Line numbers rot the moment anything above them changes, and the player uses
+the anchor to find where a step moved to and shift the range with it. Derive
+the numbers from the anchor rather than the reverse, and keep a spotlight under
+about thirty lines: a highlight over a whole function is not a highlight.
+
 Write the whole tour at triage so the author can play it end to end, then
 rewrite it as challenges change claims: the extension watches the file and
 picks up changes mid-play.
@@ -105,21 +111,18 @@ They control it from the editor, not from you: play, pause, next, previous,
 faster, slower, on the status bar and on cmd+alt+space. Your job while it plays
 is to be ready for the moment they pause and ask something.
 
-No extension: fall back to `scripts/annotate.sh <file> <notes>`, which takes
-`line|comment` pairs and opens a diff of their code against an annotated copy.
-Line numbers stay aligned and the original is untouched.
-
 **Narrate for the ear, not the page.** The author is watching, not reading, so
 each step gets two to five spoken sentences: what was decided here and why it
 could have gone otherwise. The `label` is the one line that sits against the
 code, six words at most.
 
-Two other movements, for when the tour is not the point:
+Three other movements:
 
-- `scripts/show.sh <file> <line>` just moves them to a line, for following a
-  caller or a test mid-conversation.
-- `scripts/show.sh --diff <file> <base>` shows a file against its base
-  revision, when the change matters more than the code.
+- `scripts/show.sh <file> <line>` moves them to a line, for following a caller
+  or a test mid-conversation.
+- `scripts/show.sh --diff <file> <base>` shows a file against its base revision.
+- `scripts/annotate.sh <file> <notes>` takes `line|comment` pairs and opens an
+  annotated copy beside the original, for an author with no extension.
 
 **Do not paste code into the terminal.** They are looking at it. Paste only
 when quoting two or three lines the conversation turns on.
