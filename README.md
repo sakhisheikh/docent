@@ -32,9 +32,12 @@ discussed, dims everything else, and narrates beside them with a transport you
 can drive.
 
 ```
- ◀  Pause  ▶   1x ▾              4 of 6  ·  ~9 min left
- ▓▓▓▓▓▓▓▓ ▓▓▓▓▓▓▓▓ ████████ ░░░░░░░░ ░░░░░░░░ ░░░░░░░░
-                                        ▔▔▔▔▔▔▔▔
+ ◀  Pause  ▶   1x ▾                          14 of 22  ·  ~18 min left
+
+ hid.go      report.go   keys  payload  session.go              tests
+ ▓▓ ▓▓ ▓▓ ▓▓  ▓▓ ▓▓ ▓▓    ▓▓   ▓▓ ▓▓    ▓▓ ▓▓ ▓▓ ██ ░░ ░░ ░░ ░░  ░░ ░░ ░░ ░░
+                    ▔▔                     ▔▔
+
  teardownStream: the ordering that deadlocks if reversed
  ios/hid/session.go:439
 
@@ -46,9 +49,13 @@ can drive.
         the comment and the ordering at session.go:461
 ```
 
-One segment per step, click any of them to jump there. A segment underlined in
-amber is a step resting on `inferred` claims, so you can see the weak ground
-before you reach it.
+The bar is a map of the change: one segment per step, grouped under the file it
+belongs to, each file as wide as the number of steps it earned. The current
+file's name lights up. Click any segment to jump there.
+
+Mechanical steps are dimmer, so you can see at a glance that `keys.go` is a
+formality and `session.go` is where the thinking is. A segment underlined in
+amber rests on `inferred` claims, which is where a reviewer should push.
 
 **Challenge.** Push on any claim and it runs the ladder: run the test that
 pins it; failing that write a probe and run it; failing that downgrade the

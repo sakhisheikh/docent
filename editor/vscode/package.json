@@ -2,7 +2,7 @@
   "name": "docent",
   "displayName": "Docent",
   "description": "Plays a code tour committed to a branch: the editor scrolls itself, spotlights what is being discussed, and narrates beside it",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "publisher": "sakhisheikh",
   "license": "MIT",
   "engines": {

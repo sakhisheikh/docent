@@ -105,6 +105,8 @@ function push() {
     index, total: tour.steps.length, playing, speed,
     remaining: remainingMinutes(),
     titles: tour.steps.map((s) => s.title || ''),
+    files: tour.steps.map((s) => path.basename(s.file || '')),
+    kinds: tour.steps.map((s) => s.kind || 'decision'),
     weak: tour.steps.map((s) => (s.claims || []).some((c) => c.class === 'inferred')),
     step: {
       title: step.title || '',
@@ -140,14 +142,21 @@ function chrome() {
         color:var(--vscode-dropdown-foreground);border:1px solid var(--vscode-dropdown-border);
         border-radius:4px;padding:3px 4px}
  #left{margin-left:auto;font-size:11px;opacity:.7;white-space:nowrap}
- #seek{display:flex;gap:2px;padding:0 14px 10px;flex:0 0 auto;
+ #seek{display:flex;gap:9px;padding:2px 14px 10px;flex:0 0 auto;align-items:flex-end;
        border-bottom:1px solid var(--vscode-panel-border)}
- #seek div{height:6px;flex:1;border-radius:2px;cursor:pointer;
-           background:var(--vscode-panel-border);transition:opacity .1s}
- #seek div:hover{opacity:.65}
- #seek div.done{background:var(--vscode-charts-blue)}
- #seek div.now{background:var(--vscode-charts-blue);height:10px;margin-top:-2px}
- #seek div.weak{box-shadow:inset 0 -3px 0 var(--vscode-editorWarning-foreground)}
+ .grp{display:flex;flex-direction:column;gap:3px;min-width:0}
+ .lbl{font-size:9.5px;letter-spacing:.02em;opacity:.45;white-space:nowrap;
+      overflow:hidden;text-overflow:ellipsis;font-family:var(--vscode-editor-font-family)}
+ .grp.here .lbl{opacity:1;color:var(--vscode-charts-blue)}
+ .segs{display:flex;gap:2px}
+ .segs i{height:6px;flex:1;min-width:5px;border-radius:2px;cursor:pointer;
+         background:var(--vscode-panel-border);transition:opacity .1s}
+ .segs i:hover{opacity:.6}
+ .segs i.mech{background:var(--vscode-panel-border);opacity:.55}
+ .segs i.done{background:var(--vscode-charts-blue);opacity:1}
+ .segs i.done.mech{opacity:.5}
+ .segs i.now{background:var(--vscode-charts-blue);height:11px;margin-top:-5px;opacity:1}
+ .segs i.weak{box-shadow:inset 0 -3px 0 var(--vscode-editorWarning-foreground)}
  main{padding:16px 18px;overflow:auto;flex:1 1 auto}
  h2{font-size:16px;margin:0 0 4px;font-weight:600}
  .where{font-size:11px;opacity:.55;font-family:var(--vscode-editor-font-family);
@@ -204,16 +213,46 @@ window.addEventListener('message', (ev) => {
   $('prev').disabled = s.index === 0;
   $('next').disabled = s.index >= s.total - 1;
 
-  // One segment per step: click to seek, and a step resting on weak evidence
-  // is marked so it is visible before you get there.
+  // Group consecutive steps by file, so the bar reads as a map of the change
+  // rather than a row of anonymous ticks. Each group is as wide as the number
+  // of steps that file earned.
+  const groups = [];
+  for (let i = 0; i < s.total; i++) {
+    const f = s.files[i] || '';
+    const g = groups[groups.length - 1];
+    if (g && g.file === f) g.idx.push(i);
+    else groups.push({ file: f, idx: [i] });
+  }
+
   const seek = $('seek');
   seek.innerHTML = '';
-  for (let i = 0; i < s.total; i++) {
-    const d = document.createElement('div');
-    d.className = (i === s.index ? 'now' : i < s.index ? 'done' : '') + (s.weak[i] ? ' weak' : '');
-    d.title = (i+1) + '. ' + s.titles[i];
-    d.onclick = () => vs.postMessage({type:'seek', index:i});
-    seek.appendChild(d);
+  for (const g of groups) {
+    const wrap = document.createElement('div');
+    wrap.className = 'grp' + (g.idx.includes(s.index) ? ' here' : '');
+    wrap.style.flex = String(g.idx.length);
+
+    const lbl = document.createElement('div');
+    lbl.className = 'lbl';
+    lbl.textContent = g.file;
+    lbl.title = g.file + '  ·  ' + g.idx.length + (g.idx.length === 1 ? ' step' : ' steps');
+    wrap.appendChild(lbl);
+
+    const segs = document.createElement('div');
+    segs.className = 'segs';
+    for (const i of g.idx) {
+      const it = document.createElement('i');
+      it.className = [
+        i === s.index ? 'now' : i < s.index ? 'done' : '',
+        s.kinds[i] !== 'decision' ? 'mech' : '',
+        s.weak[i] ? 'weak' : '',
+      ].filter(Boolean).join(' ');
+      it.title = (i + 1) + '. ' + s.titles[i] +
+        (s.kinds[i] !== 'decision' ? '  (' + s.kinds[i] + ')' : '');
+      it.onclick = () => vs.postMessage({ type: 'seek', index: i });
+      segs.appendChild(it);
+    }
+    wrap.appendChild(segs);
+    seek.appendChild(wrap);
   }
 
   $('title').textContent = s.step.title;
