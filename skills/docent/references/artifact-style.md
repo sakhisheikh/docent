@@ -6,6 +6,12 @@ to be here. Earn the attention.
 ## Rules
 
 1. **Plain English.** Short sentences. No em dashes, no semicolon chains.
+   Write for an engineer who has never seen this codebase. If a sentence needs
+   a term the reader would have to look up, either explain the term on first
+   use or find a plainer word: "counts upwards from when the program started"
+   beats "anchored to a monotonic origin", and "the phone" beats "the device"
+   when the device is a phone. Domain words like "surface" are fine once said
+   plainly the first time.
 2. **Never restate what the reader can see.** If the heading says
    `teardownStream`, the line under it does not say "teardownStream tears down
    the stream".
