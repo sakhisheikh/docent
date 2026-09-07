@@ -26,27 +26,27 @@ the change that prompted this tool, 120 of 2,445 lines carried every decision.
 Finding that 5% is most of the value.
 
 **Walk.** It plays. The editor opens each file, scrolls to the lines being
-discussed, dims everything else, and narrates beside them. You watch. It moves
-on by itself and holds each step long enough to read it.
+discussed, dims everything else, and narrates beside them with a transport you
+can drive.
 
 ```
-  [ your code, spotlit ]        │  4 of 6          playing · 1x · ~9 min
-                                │
-  s.receiver.Close()            │  teardownStream: the ordering that
-  ...        close first,       │  deadlocks if reversed
-             then wait          │
-  <-s.drainDone                 │  The receiver is closed before the drain
-                                │  is waited on. Reverse those two lines and
-                                │  it hangs forever, because closing the
-                                │  socket is the only thing that ends a
-                                │  blocked read.
-                                │
-                                │  READ  closing the receiver unblocks the drain
-                                │        the comment and ordering at :461
+ ◀  Pause  ▶   1x ▾              4 of 6  ·  ~9 min left
+ ▓▓▓▓▓▓▓▓ ▓▓▓▓▓▓▓▓ ████████ ░░░░░░░░ ░░░░░░░░ ░░░░░░░░
+                                        ▔▔▔▔▔▔▔▔
+ teardownStream: the ordering that deadlocks if reversed
+ ios/hid/session.go:439
+
+ The receiver is closed before the drain is waited on. Reverse
+ those two lines and it hangs forever, because closing the socket
+ is the only thing that ends a blocked read.
+
+ READ   closing the receiver unblocks the drain
+        the comment and the ordering at session.go:461
 ```
 
-Space to pause, arrows to step, up and down for speed. Pause and ask anything;
-the walk is there in the terminal.
+One segment per step, click any of them to jump there. A segment underlined in
+amber is a step resting on `inferred` claims, so you can see the weak ground
+before you reach it.
 
 **Challenge.** Push on any claim and it runs the ladder: run the test that
 pins it; failing that write a probe and run it; failing that downgrade the
@@ -99,8 +99,8 @@ cp -r . ~/.vscode/extensions/sakhisheikh.docent-0.2.0
 
 Restart VS Code, then **Docent: open the tour**.
 
-Or just click the status bar item, which toggles play and pause and shows
-where you are.
+Everything is in the panel: play, pause, step, speed, and a bar you can seek.
+The status bar item toggles play too, and the keys are there if you want them.
 
 | | |
 |---|---|
