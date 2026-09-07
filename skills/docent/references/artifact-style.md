@@ -13,6 +13,9 @@ to be here. Earn the attention.
    mutex" belongs in a review reply, not an artifact.
 4. **No meta-narration.** Cut "Half of this is byte layouts", "This document
    will walk you through", "As you can see". Start at the first real thing.
+   This includes telling the reader how long to spend: "twenty seconds, not
+   three minutes" is about the tour, not the code, and the step's kind already
+   says it.
 5. **Every claim carries its class**, exactly as the walk left it.
 6. **Permalinks pinned to the walked SHA.** Links that rot are worse than
    path:line, which at least fails honestly.
