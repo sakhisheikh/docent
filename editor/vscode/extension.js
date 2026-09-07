@@ -164,8 +164,8 @@ function chrome() {
  p{margin:0 0 14px}
  .claim{border-left:2px solid var(--vscode-panel-border);padding:6px 0 6px 10px;
         margin:8px 0;font-size:13px}
- .k{display:inline-block;min-width:68px;font-size:10px;letter-spacing:.06em;
-    text-transform:uppercase;opacity:.85}
+ .k{display:inline-block;min-width:64px;margin-right:8px;font-size:10px;
+    letter-spacing:.06em;text-transform:uppercase;opacity:.85}
  .tested .k{color:var(--vscode-testing-iconPassed)}
  .executed .k{color:var(--vscode-charts-blue)}
  .read .k{color:var(--vscode-descriptionForeground)}
@@ -174,6 +174,19 @@ function chrome() {
  .ev{opacity:.6;font-size:12px;margin-top:3px}
  .q{margin-top:18px;padding-top:12px;font-size:13px;
     border-top:1px solid var(--vscode-panel-border)}
+ .ed{background:none;border:0;padding:0 4px;margin-left:6px;cursor:pointer;
+     font-size:11px;opacity:.35;color:var(--vscode-foreground);vertical-align:middle}
+ .ed:hover{opacity:1;background:none}
+ textarea,.cls{font:inherit;font-size:13px;width:100%;box-sizing:border-box;
+   background:var(--vscode-input-background);color:var(--vscode-input-foreground);
+   border:1px solid var(--vscode-focusBorder);border-radius:4px;padding:6px 8px;
+   margin:4px 0;resize:vertical}
+ .cls{width:auto;font-size:12px;padding:3px 4px}
+ .row{display:flex;gap:6px;align-items:center;margin:4px 0}
+ .row button{font-size:11px}
+ .hint{font-size:11px;opacity:.5;margin-top:20px;padding-top:10px;
+       border-top:1px solid var(--vscode-panel-border)}
+ .hint a{color:var(--vscode-textLink-foreground);cursor:pointer}
 </style></head><body>
 <div class="bar">
   <button id="prev" title="previous step">&#9664;</button>
@@ -187,11 +200,13 @@ function chrome() {
 </div>
 <div id="seek"></div>
 <main>
-  <h2 id="title"></h2>
+  <h2><span id="title"></span><button class="ed" id="edTitle" title="edit the title">&#9998;</button></h2>
   <div class="where" id="where"></div>
-  <p id="narration"></p>
+  <div id="narration"></div>
   <div id="claims"></div>
   <div id="question"></div>
+  <div class="hint">Every field here is editable and saves straight to
+    <a id="openRaw">.docent/tour.json</a>.</div>
 </main>
 <script nonce="${nonce}">
 const vs = acquireVsCodeApi();
@@ -255,19 +270,101 @@ window.addEventListener('message', (ev) => {
     seek.appendChild(wrap);
   }
 
+  cur = s;
   $('title').textContent = s.step.title;
   $('where').textContent = s.step.where +
     (s.step.kind && s.step.kind !== 'decision' ? '   ·   ' + s.step.kind : '');
-  $('narration').textContent = s.step.narration;
-  const claims = (s.step.claims || []).slice().sort(
-    (a,b) => order.indexOf(a.class) - order.indexOf(b.class));
-  $('claims').innerHTML = claims.map(c =>
-    '<div class="claim ' + esc(c.class||'inferred') + '"><span class="k">' +
-    esc(c.class||'inferred') + '</span>' + esc(c.text) +
-    (c.evidence ? '<div class="ev">' + esc(c.evidence) + '</div>' : '') + '</div>').join('');
-  $('question').innerHTML = s.step.question
-    ? '<div class="q"><b>A reviewer will ask:</b> ' + esc(s.step.question) + '</div>' : '';
+
+  $('narration').innerHTML = '<p>' + esc(s.step.narration) +
+    '<button class="ed" data-f="narration" title="edit">&#9998;</button></p>';
+
+  // Claims keep their original positions in the file, so an edit targets the
+  // right one even though they are displayed strongest first.
+  const claims = (s.step.claims || [])
+    .map((c, i) => ({ c, i }))
+    .sort((a, b) => order.indexOf(a.c.class) - order.indexOf(b.c.class));
+  $('claims').innerHTML = claims.map(({ c, i }) =>
+    '<div class="claim ' + esc(c.class||'inferred') + '">' +
+    '<span class="k">' + esc(c.class||'inferred') + '</span>' + esc(c.text) +
+    '<button class="ed" data-f="claim" data-i="' + i + '" data-p="text" title="edit the claim">&#9998;</button>' +
+    '<div class="ev">' + esc(c.evidence || 'no evidence recorded') +
+    '<button class="ed" data-f="claim" data-i="' + i + '" data-p="evidence" title="edit the evidence">&#9998;</button>' +
+    '<button class="ed" data-f="claim" data-i="' + i + '" data-p="class" title="change the evidence class">&#9670;</button>' +
+    '</div></div>').join('');
+
+  $('question').innerHTML = '<div class="q"><b>A reviewer will ask:</b> ' +
+    esc(s.step.question || 'nothing recorded') +
+    '<button class="ed" data-f="question" title="edit">&#9998;</button></div>';
+
+  document.querySelectorAll('.ed[data-f]').forEach(b => {
+    b.onclick = () => openEditor(b);
+  });
 });
+
+let cur = null;
+$('edTitle').onclick = () => openEditor($('edTitle'), 'title');
+$('openRaw').onclick = () => vs.postMessage({type:'reveal'});
+
+// Replace the clicked block with an input, so editing happens where the text is
+// rather than in a dialog away from it.
+function openEditor(btn, forced) {
+  if (!cur) return;
+  const field = forced || btn.dataset.f;
+  const ci = btn.dataset.i !== undefined ? parseInt(btn.dataset.i, 10) : undefined;
+  const part = btn.dataset.p;
+  const step = cur.step;
+
+  let value = '';
+  if (field === 'claim') {
+    const c = (step.claims || [])[ci] || {};
+    value = part === 'class' ? (c.class || 'inferred') : (c[part] || '');
+  } else {
+    value = step[field] || '';
+  }
+
+  const host = btn.parentElement;
+  const original = host.innerHTML;
+  host.innerHTML = '';
+
+  let input;
+  if (part === 'class') {
+    input = document.createElement('select');
+    input.className = 'cls';
+    for (const k of order) {
+      const o = document.createElement('option');
+      o.value = k; o.textContent = k; if (k === value) o.selected = true;
+      input.appendChild(o);
+    }
+  } else {
+    input = document.createElement('textarea');
+    input.rows = field === 'narration' ? 6 : 2;
+    input.value = value;
+  }
+  host.appendChild(input);
+
+  const row = document.createElement('div');
+  row.className = 'row';
+  const save = document.createElement('button');
+  save.textContent = 'Save';
+  const cancel = document.createElement('button');
+  cancel.textContent = 'Cancel';
+  row.appendChild(save); row.appendChild(cancel);
+  host.appendChild(row);
+  input.focus();
+
+  cancel.onclick = () => { host.innerHTML = original;
+    host.querySelectorAll('.ed[data-f]').forEach(b => { b.onclick = () => openEditor(b); }); };
+  save.onclick = () => vs.postMessage({
+    type: 'edit', index: cur.index, field, claim: ci, part, value: input.value,
+  });
+  // Enter saves a one-liner; a narration needs Enter for paragraphs.
+  input.onkeydown = (e) => {
+    if (e.key === 'Escape') cancel.onclick();
+    if (e.key === 'Enter' && (field !== 'narration' || e.metaKey || e.ctrlKey)) {
+      e.preventDefault(); save.onclick();
+    }
+  };
+}
 </script></body></html>`;
 }
 
@@ -302,6 +399,46 @@ async function goto(i) {
   if (playing) schedule();
 }
 
+let selfWrite = false;
+
+function tourPath() {
+  const r = root();
+  return r ? path.join(r, '.docent', 'tour.json') : null;
+}
+
+// Apply one edit and persist. Re-reads the file so an edit does not overwrite
+// changes the walk made while the panel was open.
+function applyEdit(m) {
+  const p = tourPath();
+  if (!p) return;
+  let disk;
+  try {
+    disk = JSON.parse(fs.readFileSync(p, 'utf8'));
+  } catch (e) {
+    vscode.window.showErrorMessage('Docent: tour.json is not readable, edit not saved');
+    return;
+  }
+  const step = (disk.steps || [])[m.index];
+  if (!step) return;
+
+  if (m.field === 'title' || m.field === 'narration' || m.field === 'question') {
+    if (m.value.trim()) step[m.field] = m.value.trim();
+    else delete step[m.field];
+  } else if (m.field === 'claim') {
+    const c = (step.claims || [])[m.claim];
+    if (!c) return;
+    if (m.part === 'class') c.class = m.value;
+    else if (m.value.trim()) c[m.part] = m.value.trim();
+    else delete c[m.part];
+  }
+
+  selfWrite = true;
+  fs.writeFileSync(p, JSON.stringify(disk, null, 2) + '\n');
+  tour = { steps: disk.steps || [], title: disk.title || 'walkthrough' };
+  push();
+  vscode.window.setStatusBarMessage('Docent: saved to tour.json', 1500);
+}
+
 async function openPanel() {
   if (panel) { panel.reveal(vscode.ViewColumn.Two, true); return; }
   panel = vscode.window.createWebviewPanel(
@@ -317,6 +454,11 @@ async function openPanel() {
     else if (m.type === 'prev') await goto(index - 1);
     else if (m.type === 'seek') await goto(m.index);
     else if (m.type === 'speed') { speed = m.value; setPlaying(playing); }
+    else if (m.type === 'edit') { setPlaying(false); applyEdit(m); }
+    else if (m.type === 'reveal') {
+      const p = tourPath();
+      if (p) vscode.window.showTextDocument(vscode.Uri.file(p), { preview: false });
+    }
   });
   panel.onDidDispose(() => {
     panel = null; chromeSent = false; playing = false;
@@ -353,7 +495,10 @@ function activate(context) {
   const r = root();
   if (r) {
     const w = vscode.workspace.createFileSystemWatcher(new vscode.RelativePattern(r, '.docent/tour.json'));
-    const reload = async () => { if (loadTour()) { await render(); if (playing) schedule(); } };
+    const reload = async () => {
+      if (selfWrite) { selfWrite = false; return; }
+      if (loadTour()) { await render(); if (playing) schedule(); }
+    };
     w.onDidChange(reload); w.onDidCreate(reload);
     context.subscriptions.push(w);
     if (loadTour() && tour.steps.length) {

@@ -17,17 +17,27 @@ to be here. Earn the attention.
    the stream".
 3. **Never describe what the code does not do.** "Deliberately not behind the
    mutex" belongs in a review reply, not an artifact.
-4. **No meta-narration.** Cut "Half of this is byte layouts", "This document
+4. **Explain the code as it stands, not the journey to it.** The reader was not
+   in the room. "The earlier version released at the end of the path" means
+   nothing to them, and "the release position bug" names something they have
+   never heard of. State the hazard instead: "releasing at point ten when the
+   finger stopped at three reads as a flick to a place it never went." Same
+   fact, no history required.
+5. **Say why a fact matters, not just that it is true.** "streamLost is atomic"
+   is trivia. "It is atomic because the draining goroutine cannot take the
+   mutex, since a gesture holds it while sending" is the reason the code is
+   shaped that way.
+6. **No meta-narration.** Cut "Half of this is byte layouts", "This document
    will walk you through", "As you can see". Start at the first real thing.
    This includes telling the reader how long to spend: "twenty seconds, not
    three minutes" is about the tour, not the code, and the step's kind already
    says it.
-5. **Every claim carries its class**, exactly as the walk left it.
-6. **Permalinks pinned to the walked SHA.** Links that rot are worse than
+7. **Every claim carries its class**, exactly as the walk left it.
+8. **Permalinks pinned to the walked SHA.** Links that rot are worse than
    path:line, which at least fails honestly.
-7. **Name what you skipped, with counts.** "4 test files, +727 lines, read as
+9. **Name what you skipped, with counts.** "4 test files, +727 lines, read as
    evidence" beats silence.
-8. **No line counts as an excuse.** State size once as a fact if useful, never
+10. **No line counts as an excuse.** State size once as a fact if useful, never
    as an apology or a boast.
 
 ## The shape that worked
