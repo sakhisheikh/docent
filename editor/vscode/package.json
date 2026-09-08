@@ -9,6 +9,7 @@
     "vscode": "^1.80.0"
   },
   "categories": [
+    "Education",
     "Other"
   ],
   "activationEvents": [
@@ -114,5 +115,10 @@
     "code-tour",
     "pull-request",
     "narration"
-  ]
+  ],
+  "icon": "icon.png",
+  "galleryBanner": {
+    "color": "#1e222a",
+    "theme": "dark"
+  }
 }
