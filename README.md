@@ -112,12 +112,22 @@ an admission.
 
 This is the player, and most of the point.
 
+Install the `.vsix` from the
+[latest release](https://github.com/sakhisheikh/docent/releases/latest):
+
+```
+code --install-extension docent-0.9.0.vsix
+```
+
+Or from a checkout, which is what you want if you are changing it:
+
 ```
 cd editor/vscode
 cp -r . ~/.vscode/extensions/sakhisheikh.docent-0.9.0
 ```
 
-Restart VS Code, then **Docent: open the tour**.
+Either way restart VS Code, then **Docent: open the tour**. It is not on the
+VS Code Marketplace yet.
 
 Everything is in the panel: play, pause, step, speed, and a bar you can seek.
 The status bar item toggles play too, and the keys are there if you want them.
@@ -135,6 +145,20 @@ speaker button in the panel silences it. macOS uses `say` and Linux `spd-say`;
 | ctrl+alt+v | voice on or off |
 
 macOS claims cmd+alt+space for Finder search, which is why these use ctrl.
+
+## What is proven and what is not
+
+The product's own rule applies to its README.
+
+- **The player works.** Tours play, seek, spotlight, follow drifting line
+  numbers, read out loud, and save edits back to `tour.json`. Pinned by
+  `tests/voice_test.js` and used daily.
+- **Triage works.** Given a 1,754 line change across 9 files, the protocol
+  independently picked the same five stops two people had picked by hand over
+  an afternoon, three of them at the exact line, in 59 seconds.
+- **A tour generated end to end has not been proven.** Every tour played so
+  far was written by hand. This is the open question, and
+  [CONTRIBUTING.md](CONTRIBUTING.md) says what would help.
 
 ## Requirements
 

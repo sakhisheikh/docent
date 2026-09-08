@@ -1,0 +1,24 @@
+name: tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    # Both platforms, because the player picks a different speech command on
+    # each and the choice is only exercised by running there.
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # facts.sh needs history to find a merge base
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: ./tests/run.sh
