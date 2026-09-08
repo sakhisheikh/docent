@@ -26,7 +26,7 @@ The player:
 
 ```
 cd editor/vscode
-cp -r . ~/.vscode/extensions/sakhisheikh.docent-0.9.0
+cp -r . ~/.vscode/extensions/sakhimansoor.docent-0.9.0
 ```
 
 Restart VS Code, then **Docent: open the tour** in any repo with a

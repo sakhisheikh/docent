@@ -3,7 +3,7 @@
   "displayName": "Docent",
   "description": "Plays an editable code tour committed to a branch: the editor scrolls itself, spotlights what is being discussed, and narrates beside it",
   "version": "0.9.0",
-  "publisher": "sakhisheikh",
+  "publisher": "sakhimansoor",
   "license": "MIT",
   "engines": {
     "vscode": "^1.80.0"

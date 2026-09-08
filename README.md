@@ -123,7 +123,7 @@ Or from a checkout, which is what you want if you are changing it:
 
 ```
 cd editor/vscode
-cp -r . ~/.vscode/extensions/sakhisheikh.docent-0.9.0
+cp -r . ~/.vscode/extensions/sakhimansoor.docent-0.9.0
 ```
 
 Either way restart VS Code, then **Docent: open the tour**. It is not on the
