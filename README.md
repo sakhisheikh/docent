@@ -1,26 +1,27 @@
 # docent
 
-An AI writes 2,000 lines. Your name goes on the pull request. You have not read
-a line of it, and the reviewer is about to ask you questions.
+A 2,000 line diff has maybe a hundred lines where someone made a decision. The
+rest is lookup tables, byte packing and plumbing.
 
-Docent walks you through it, in your editor, out loud, with every claim marked
-as tested or merely assumed.
+Docent finds those hundred, walks you through them in your editor, and marks
+every claim as tested or merely assumed. The walkthrough commits to the branch,
+so each reviewer plays the same one instead of starting the diff from the top.
 
 ```
  ◀  Pause  ▶   1x ▾   🔊                      14 of 22  ·  ~18 min left
 
- hid.go      report.go   keys  payload  session.go              tests
+ client.go   codec.go    util  config   store.go                tests
  ▓▓ ▓▓ ▓▓ ▓▓  ▓▓ ▓▓ ▓▓    ▓▓   ▓▓ ▓▓    ▓▓ ▓▓ ▓▓ ██ ░░ ░░ ░░ ░░  ░░ ░░ ░░ ░░
 
- teardownStream: the ordering that deadlocks if reversed
- ios/hid/session.go:439
+ closeAndWait: the ordering that deadlocks if reversed
+ store.go:214
 
- The receiver is closed before the drain is waited on. Reverse
+ The reader is closed before the worker is waited on. Reverse
  those two lines and it hangs forever, because closing the socket
  is the only thing that ends a blocked read.
 
- READ   closing the receiver unblocks the drain
-        the comment and the ordering at session.go:461
+ READ   closing the reader unblocks the worker
+        the comment and the ordering at store.go:231
 ```
 
 The bar maps the change: one segment per step, grouped by file, each file as

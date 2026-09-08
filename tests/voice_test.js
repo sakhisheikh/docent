@@ -19,9 +19,9 @@ fs.writeFileSync(path.join(repo, 'a.go'), Array.from({ length: 40 }, (_, i) => `
 
 const tour = {
   version: 1,
-  title: 'PR 849',
+  title: 'PR 412',
   steps: [
-    { file: 'a.go', focus: [3, 6], point: 4, title: 'ensureStream holds the mutex', narration: '-leading dash and `ticks`.' },
+    { file: 'a.go', focus: [3, 6], point: 4, title: 'openOnce holds the mutex', narration: '-leading dash and `ticks`.' },
     { file: 'a.go', focus: [9, 12], point: 10, title: 'second', narration: 'second stop.' },
   ],
 };
@@ -132,8 +132,8 @@ const ok = (what) => { n++; console.log(`  ok ${what}`); };
   assert.ok(said.startsWith('-leading') === false, 'text must not be an option');
   ok('the tour text goes after -- as a single argument');
 
-  assert.ok(said.startsWith('PR 849.'), `tour title announced first: ${said}`);
-  assert.ok(said.includes('ensure Stream'), `camel case is split for the ear: ${said}`);
+  assert.ok(said.startsWith('PR 412.'), `tour title announced first: ${said}`);
+  assert.ok(said.includes('open Once'), `camel case is split for the ear: ${said}`);
   assert.ok(!said.includes('`'), 'markdown ticks are not read out');
   ok('title, then step title with camel case split, no ticks');
 
@@ -158,7 +158,7 @@ const ok = (what) => { n++; console.log(`  ok ${what}`); };
   await sleep(1800);
   assert.equal(state().index, 1, 'the step should advance once the voice finishes');
   assert.equal(spawned.length, 2, 'the next step should be read too');
-  assert.ok(!spawned[1].args[spawned[1].args.length - 1].includes('PR 849'),
+  assert.ok(!spawned[1].args[spawned[1].args.length - 1].includes('PR 412'),
     'the tour title is announced once, not at every stop');
   ok('close advances, and the title is not repeated');
 

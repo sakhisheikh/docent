@@ -86,8 +86,8 @@ installed the author watches: the editor opens each file, scrolls to the lines
 under discussion, dims everything else, and narrates beside them. It advances
 on its own until they pause.
 
-    {"version": 1, "title": "PR 849", "steps": [{
-      "file": "ios/hid/session.go",
+    {"version": 1, "title": "PR 412", "steps": [{
+      "file": "internal/store/store.go",
       "focus": [439, 470],
       "point": 461, "label": "close first, then wait",
       "title": "the ordering that deadlocks if reversed",
@@ -130,7 +130,7 @@ when quoting two or three lines the conversation turns on.
 The terminal message carries the transport bar, the narration, and the claims.
 The editor carries the code and the margin notes.
 
-    STOP 3 of 6 - ensureStream (session.go:376)
+    STOP 3 of 6 - openOnce (store.go:376)
     [####------] 3/6 - about 32 min left        speed 1x
     playing in your editor
 

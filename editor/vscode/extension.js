@@ -62,7 +62,7 @@ function speechText(step) {
   if (step.title) parts.push(step.title);
   if (step.narration) parts.push(step.narration);
   return parts.join('. ')
-    // A voice says ensureStream as one slurred word, so the case boundary
+    // A voice says openOnce as one slurred word, so the case boundary
     // becomes a space. Markdown ticks are read out as characters.
     .replace(/[`*_]/g, '')
     .replace(/([a-z0-9])([A-Z])/g, '$1 $2')

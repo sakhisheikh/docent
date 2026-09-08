@@ -26,5 +26,5 @@ section if the change has none.}
 
 ### The rest
 
-{Everything skipped, named with counts. "keys.go is a lookup table, 157 lines.
-report.go packs bytes to the layouts in its comments."}
+{Everything skipped, named with counts. "tables.go is a lookup table, 157
+lines. codec.go packs bytes to the layouts in its comments."}

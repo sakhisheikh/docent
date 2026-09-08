@@ -67,7 +67,7 @@ to state without evidence.
 ## What good looks like
 
     CLAIMS
-      [tested]   a stray release is a no-op (TestTouchUpWithNothingDown)
+      [tested]   a stray release is a no-op (TestReleaseWithNothingHeld)
       [executed] 5 gestures share one stream (ran the script, 1 negotiation)
       [read]     Close lifts a held contact before tearing the stream down
       [inferred] repeated churn wedges the daemon; never reproduced on purpose

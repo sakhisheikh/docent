@@ -13,7 +13,7 @@ before speaking. It is the truth; your memory of the walk is not.**
   "base": "7e82aa2...",
   "base_ref": "upstream/main",
   "remote": "https://github.com/owner/repo",
-  "skipped": "4 test files (+727) read as evidence; keys.go, 157 lines, lookup table",
+  "skipped": "4 test files (+727) read as evidence; tables.go, 157 lines, lookup table",
   "position": 2,
   "speed": 1,
   "mode": "pause",
@@ -22,7 +22,7 @@ before speaking. It is the truth; your memory of the walk is not.**
     {
       "id": 1,
       "title": "Why a HID package owns a video stream",
-      "file": "ios/hid/hid.go",
+      "file": "internal/store/store.go",
       "line": 1,
       "status": "walked",
       "claims": [

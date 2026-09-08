@@ -13,7 +13,7 @@ to be here. Earn the attention.
    when the device is a phone. Domain words like "surface" are fine once said
    plainly the first time.
 2. **Never restate what the reader can see.** If the heading says
-   `teardownStream`, the line under it does not say "teardownStream tears down
+   `closeAndWait`, the line under it does not say "closeAndWait closes and
    the stream".
 3. **Never describe what the code does not do.** "Deliberately not behind the
    mutex" belongs in a review reply, not an artifact.
@@ -23,7 +23,7 @@ to be here. Earn the attention.
    never heard of. State the hazard instead: "releasing at point ten when the
    finger stopped at three reads as a flick to a place it never went." Same
    fact, no history required.
-5. **Say why a fact matters, not just that it is true.** "streamLost is atomic"
+5. **Say why a fact matters, not just that it is true.** "the flag is atomic"
    is trivia. "It is atomic because the draining goroutine cannot take the
    mutex, since a gesture holds it while sending" is the reason the code is
    shaped that way.

@@ -1,28 +1,29 @@
 # Docent
 
-An AI writes 2,000 lines. Your name goes on the pull request. You have not read
-a line of it, and the reviewer is about to ask you questions.
+Plays a guided walkthrough of a code change, committed to the branch. The
+editor opens each file, scrolls to the lines being discussed, dims everything
+else, and **reads the explanation out loud while you look at the code**.
 
-This plays the walkthrough. The editor opens each file, scrolls to the lines
-being discussed, dims everything else, and **reads the explanation out loud
-while you look at the code**.
+Built for changes too large to read from the top: a 2,000 line diff usually has
+about a hundred lines where someone made a decision, and this puts you on
+them.
 
 ```
  ◀  Pause  ▶   1x ▾   🔊                      14 of 22  ·  ~18 min left
 
- hid.go      report.go   keys  payload  session.go              tests
+ client.go   codec.go    util  config   store.go                tests
  ▓▓ ▓▓ ▓▓ ▓▓  ▓▓ ▓▓ ▓▓    ▓▓   ▓▓ ▓▓    ▓▓ ▓▓ ▓▓ ██ ░░ ░░ ░░ ░░  ░░ ░░ ░░ ░░
                     ▔▔                     ▔▔
 
- teardownStream: the ordering that deadlocks if reversed
- ios/hid/session.go:439
+ closeAndWait: the ordering that deadlocks if reversed
+ store.go:214
 
- The receiver is closed before the drain is waited on. Reverse
+ The reader is closed before the worker is waited on. Reverse
  those two lines and it hangs forever, because closing the socket
  is the only thing that ends a blocked read.
 
- READ   closing the receiver unblocks the drain
-        the comment and the ordering at session.go:461
+ READ   closing the reader unblocks the worker
+        the comment and the ordering at store.go:231
 ```
 
 The bar is a map of the change: one segment per step, grouped under the file it
