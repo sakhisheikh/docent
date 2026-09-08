@@ -5,18 +5,115 @@ a line of it, and the reviewer is about to ask you questions.
 
 Docent walks you through it.
 
-## Install
+## Setup
+
+Two pieces, and which you need depends on what you are doing.
+
+| | what it does | who needs it |
+|---|---|---|
+| **Claude Code plugin** | generates the tour | whoever is sending a change for review |
+| **VS Code extension** | plays the tour | everyone, reviewers included |
+
+If you only ever review other people's changes, the extension alone is enough.
+
+### 1. Install the plugin
+
+In Claude Code, type these two lines:
 
 ```
 /plugin marketplace add sakhisheikh/docent
 /plugin install docent@docent
 ```
 
-Then, on a branch you are about to send for review:
+To check it worked, type `/plugin` and look at the **Installed** tab. You
+should see `docent`. The first command registers this repo as a marketplace;
+the second installs the plugin from it.
+
+### 2. Install the extension
+
+Open the Extensions pane, **⇧⌘X** on macOS or **Ctrl+Shift+X** elsewhere,
+search **docent** and pick the one published by **sakhimansoor**. Or from a
+terminal:
+
+```
+code --install-extension sakhimansoor.docent
+```
+
+On macOS `code` often is not on your PATH. If you get "command not found",
+open VS Code, press **⇧⌘P**, and run **Shell Command: Install 'code' command
+in PATH**. Or just use the Extensions pane.
+
+### 3. Generate a tour
+
+Check out the branch you are about to send for review, then in Claude Code:
 
 ```
 /docent
 ```
+
+It reads the diff, tells you the plan, and waits. Nothing is committed or
+posted without asking.
+
+### 4. Play it
+
+Press **⇧⌘P** on macOS or **Ctrl+Shift+P** elsewhere and run **Docent: open
+the tour**. There is also a `docent` item in the status bar at the bottom left
+which plays and pauses.
+
+If a branch already carries a tour, the extension says so when you open the
+folder and offers to play it.
+
+### Keys
+
+macOS reserves **⌘⌥Space** for Finder search, so docent uses Control and
+Option instead. On a Mac keyboard **⌥** is the Option key, sometimes printed
+as Alt.
+
+| macOS | Windows and Linux | |
+|---|---|---|
+| **⌃⌥Space** | Ctrl+Alt+Space | play or pause |
+| **⌃⌥[** and **⌃⌥]** | Ctrl+Alt+[ and ] | previous, next |
+| **⌃⌥-** and **⌃⌥=** | Ctrl+Alt+- and = | slower, faster |
+| **⌃⌥V** | Ctrl+Alt+V | voice on or off |
+
+Everything is also in the panel as buttons, so you never have to learn these.
+
+### Setting it up for a team
+
+Commit this as `.claude/settings.json` in whatever repo the team works in.
+Then nobody has to type or spell anything, and step 1 happens by itself:
+
+```json
+{
+  "extraKnownMarketplaces": {
+    "docent": { "source": { "source": "github", "repo": "sakhisheikh/docent" } }
+  },
+  "enabledPlugins": { "docent@docent": true }
+}
+```
+
+They still install the extension themselves, since VS Code extensions cannot
+be installed from a repo.
+
+### Updating
+
+The extension updates itself from the marketplace. The plugin does not: it is
+pinned to a commit when installed, so pick up a new version with
+
+```
+/plugin marketplace update docent
+```
+
+### If something does not work
+
+| what you see | what it is |
+|---|---|
+| `/docent` is not offered | the plugin is not installed. Run `/plugin` and check the Installed tab |
+| "no .docent/tour.json in this workspace" | nothing has generated a tour on this branch yet. Run `/docent` |
+| The panel opens but the code does not move | the tour points at files that are not in this checkout. Check you are on the right branch |
+| "anchor not found, the highlight may be stale" | the code moved more than the player could follow. The narration is still right, the highlight may not be |
+| Nothing is read out loud | on Windows there is no voice yet and steps are timed instead. On Linux install `speech-dispatcher` for `spd-say` |
+| Keys do nothing | another extension has them. Rebind under **Keyboard Shortcuts**, search `docent` |
 
 ## What it does
 
@@ -110,24 +207,13 @@ an admission.
 
 ## The editor extension
 
-This is the player, and most of the point.
-
-Install the `.vsix` from the
-[latest release](https://github.com/sakhisheikh/docent/releases/latest):
-
-```
-code --install-extension docent-0.9.0.vsix
-```
-
-Or from a checkout, which is what you want if you are changing it:
+This is the player, and most of the point. Installing it is step 2 above; if
+you are changing the extension itself, run it from a checkout instead:
 
 ```
 cd editor/vscode
 cp -r . ~/.vscode/extensions/sakhimansoor.docent-0.9.0
 ```
-
-Either way restart VS Code, then **Docent: open the tour**. It is not on the
-VS Code Marketplace yet.
 
 Everything is in the panel: play, pause, step, speed, and a bar you can seek.
 The status bar item toggles play too, and the keys are there if you want them.
@@ -136,15 +222,6 @@ Each stop is read out loud, so the code can be read while listening, and the
 step ends when the sentence does rather than on a guess at reading speed. The
 speaker button in the panel silences it. macOS uses `say` and Linux `spd-say`;
 `docent.voice` picks a voice, and `docent.speak` turns it off by default.
-
-| | |
-|---|---|
-| ctrl+alt+space | play or pause |
-| ctrl+alt+[ ctrl+alt+] | previous, next |
-| ctrl+alt+- ctrl+alt+= | slower, faster |
-| ctrl+alt+v | voice on or off |
-
-macOS claims cmd+alt+space for Finder search, which is why these use ctrl.
 
 ## What is proven and what is not
 
@@ -162,8 +239,12 @@ The product's own rule applies to its README.
 
 ## Requirements
 
-Claude Code, git, and a repo. GitHub remotes get permalinks; other remotes
-degrade to `path:line`. Nothing is posted anywhere without asking.
+Claude Code, git, and a repo, plus VS Code 1.80 or newer for the player.
+GitHub remotes get permalinks; other remotes degrade to `path:line`. Nothing is
+posted anywhere without asking.
+
+Speech uses the operating system's own voice: `say` on macOS, `spd-say` on
+Linux. Windows has none yet, so steps are held on a timer instead.
 
 ## Licence
 
