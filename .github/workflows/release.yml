@@ -1,0 +1,86 @@
+name: release
+
+# Pushing a v* tag is the whole release. The tag is the source of truth and the
+# job refuses to run if package.json disagrees with it, so a mistyped tag fails
+# here rather than shipping the wrong version under the right name.
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Existing v* tag to release'
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    # Secrets cannot be read in an `if:` directly, so they come through env and
+    # each publish step checks its own. A missing token skips that registry
+    # instead of failing the release.
+    env:
+      VSCE_PAT: ${{ secrets.VSCE_PAT }}
+      OVSX_TOKEN: ${{ secrets.OVSX_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag || github.ref }}
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Tests
+        run: ./tests/run.sh
+
+      - name: Check the tag matches the manifest
+        id: v
+        run: |
+          tag="${{ inputs.tag || github.ref_name }}"
+          tag="${tag#v}"
+          manifest=$(node -p "require('./editor/vscode/package.json').version")
+          if [ "$tag" != "$manifest" ]; then
+            echo "::error::tag v$tag does not match package.json $manifest"
+            exit 1
+          fi
+          echo "version=$tag" >> "$GITHUB_OUTPUT"
+          echo "vsix=docent-$tag.vsix" >> "$GITHUB_OUTPUT"
+
+      - name: Package
+        working-directory: editor/vscode
+        run: npx --yes @vscode/vsce package --out "${{ github.workspace }}/${{ steps.v.outputs.vsix }}"
+
+      - name: GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag="v${{ steps.v.outputs.version }}"
+          if gh release view "$tag" >/dev/null 2>&1; then
+            gh release upload "$tag" "${{ steps.v.outputs.vsix }}" --clobber
+          else
+            gh release create "$tag" "${{ steps.v.outputs.vsix }}" \
+              --title "$tag" --generate-notes
+          fi
+
+      # Open VSX. The namespace only needs creating once and errors if it
+      # already exists, which is not a reason to fail a release.
+      - name: Open VSX
+        if: env.OVSX_TOKEN != ''
+        run: |
+          npx --yes ovsx create-namespace sakhimansoor -p "$OVSX_TOKEN" || true
+          npx --yes ovsx publish "${{ steps.v.outputs.vsix }}" -p "$OVSX_TOKEN"
+
+      - name: VS Code Marketplace
+        if: env.VSCE_PAT != ''
+        run: npx --yes @vscode/vsce publish --packagePath "${{ steps.v.outputs.vsix }}" -p "$VSCE_PAT"
+
+      - name: Where it went
+        run: |
+          echo "### docent v${{ steps.v.outputs.version }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- GitHub release: yes" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Open VSX: ${{ env.OVSX_TOKEN != '' && 'yes' || 'skipped, no OVSX_TOKEN' }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- VS Code Marketplace: ${{ env.VSCE_PAT != '' && 'yes' || 'skipped, no VSCE_PAT' }}" >> "$GITHUB_STEP_SUMMARY"

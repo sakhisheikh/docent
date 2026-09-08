@@ -71,4 +71,14 @@ grep -qE "spawn\(.*shell" "$ext" && fail "speech must not run through a shell"
 grep -q "'--', text" "$ext" || fail "speech text must follow -- so a leading dash stays text"
 grep -q "docent.voice" editor/vscode/package.json || fail "voice toggle not contributed"
 
+# The release pipeline is the thing nobody notices is broken until a release.
+# These are the two mistakes that ship the wrong bytes under the right name.
+rel=.github/workflows/release.yml
+[ -f "$rel" ] || fail "release workflow missing"
+grep -q "does not match package.json" "$rel" || fail "release must fail when the tag and manifest disagree"
+grep -q -- "--packagePath" "$rel" || fail "publish the packaged vsix, not a fresh build, so every registry gets the same bytes"
+grep -q "env.VSCE_PAT != ''" "$rel" || fail "a missing marketplace token must skip, not fail the release"
+grep -q "env.OVSX_TOKEN != ''" "$rel" || fail "a missing Open VSX token must skip, not fail the release"
+[ -x scripts/release.sh ] || fail "release.sh not executable"
+
 echo "ok: plugin_test"
