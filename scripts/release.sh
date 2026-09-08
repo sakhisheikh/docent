@@ -6,7 +6,10 @@
 set -euo pipefail
 
 cd "$(dirname "$0")/.."
+# Two manifests carry a version: the extension's and the plugin's. They are
+# released together, so they are bumped together.
 manifest=editor/vscode/package.json
+plugin=.claude-plugin/plugin.json
 
 [ $# -eq 1 ] || { echo "usage: $0 patch|minor|major|<version>"; exit 1; }
 [ -z "$(git status --porcelain)" ] || { echo "working tree is dirty, commit first"; exit 1; }
@@ -23,22 +26,24 @@ case "$1" in
   *) next="$1" ;;
 esac
 
-# The tag is the source of truth in CI, so the manifest has to agree with it
-# before the tag exists, not after.
-node -e "
-  const fs=require('fs'), p='$manifest'
-  const d=JSON.parse(fs.readFileSync(p))
-  d.version='$next'
-  fs.writeFileSync(p, JSON.stringify(d,null,2)+'\n')"
+# The tag is the source of truth in CI, so both manifests have to agree with
+# it before the tag exists, not after.
+for f in "$manifest" "$plugin"; do
+  node -e "
+    const fs=require('fs'), p='$f'
+    const d=JSON.parse(fs.readFileSync(p))
+    d.version='$next'
+    fs.writeFileSync(p, JSON.stringify(d,null,2)+'\n')"
+done
 
 ./tests/run.sh
 
 echo
 echo "$current -> $next"
 read -rp "tag v$next and push? [y/N] " ok
-[ "$ok" = "y" ] || { git checkout -- "$manifest"; echo "aborted"; exit 1; }
+[ "$ok" = "y" ] || { git checkout -- "$manifest" "$plugin"; echo "aborted"; exit 1; }
 
-git add "$manifest"
+git add "$manifest" "$plugin"
 git commit -q -m "Release v$next"
 git tag -a "v$next" -m "v$next"
 git push -q origin main "v$next"

@@ -81,4 +81,12 @@ grep -q "env.VSCE_PAT != ''" "$rel" || fail "a missing marketplace token must sk
 grep -q "env.OVSX_TOKEN != ''" "$rel" || fail "a missing Open VSX token must skip, not fail the release"
 [ -x scripts/release.sh ] || fail "release.sh not executable"
 
+# One release, one version. The extension and the plugin ship from the same
+# commit, so a reader who sees 0.9.1 in one and 0.9.0 in the other cannot tell
+# which is the release.
+ver_x=$(node -p "require('./editor/vscode/package.json').version")
+ver_p=$(node -p "require('./.claude-plugin/plugin.json').version")
+[ "$ver_x" = "$ver_p" ] || fail "version drift: extension $ver_x, plugin $ver_p"
+grep -q 'plugin=.claude-plugin/plugin.json' scripts/release.sh || fail "release.sh must bump the plugin version too"
+
 echo "ok: plugin_test"
