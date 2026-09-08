@@ -1,7 +1,7 @@
 {
   "name": "docent",
   "description": "Generates a review tour of a change you did not write, commits it to the branch, and plays it in your editor: the code scrolls itself, each decision is spotlit, and every claim carries its evidence. Reviewers play the same tour.",
-  "version": "0.9.1",
+  "version": "0.9.2",
   "author": {
     "name": "Sakhi Mansoor"
   },
