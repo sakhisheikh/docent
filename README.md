@@ -114,7 +114,7 @@ This is the player, and most of the point.
 
 ```
 cd editor/vscode
-cp -r . ~/.vscode/extensions/sakhisheikh.docent-0.2.0
+cp -r . ~/.vscode/extensions/sakhisheikh.docent-0.9.0
 ```
 
 Restart VS Code, then **Docent: open the tour**.
@@ -122,11 +122,17 @@ Restart VS Code, then **Docent: open the tour**.
 Everything is in the panel: play, pause, step, speed, and a bar you can seek.
 The status bar item toggles play too, and the keys are there if you want them.
 
+Each stop is read out loud, so the code can be read while listening, and the
+step ends when the sentence does rather than on a guess at reading speed. The
+speaker button in the panel silences it. macOS uses `say` and Linux `spd-say`;
+`docent.voice` picks a voice, and `docent.speak` turns it off by default.
+
 | | |
 |---|---|
 | ctrl+alt+space | play or pause |
 | ctrl+alt+[ ctrl+alt+] | previous, next |
 | ctrl+alt+- ctrl+alt+= | slower, faster |
+| ctrl+alt+v | voice on or off |
 
 macOS claims cmd+alt+space for Finder search, which is why these use ctrl.
 

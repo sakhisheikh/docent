@@ -7,6 +7,7 @@
 const vscode = require('vscode');
 const path = require('path');
 const fs = require('fs');
+const { spawn } = require('child_process');
 
 let tour = { steps: [], title: 'walkthrough' };
 let index = 0;
@@ -16,6 +17,11 @@ let timer = null;
 let panel = null;
 let status = null;
 let chromeSent = false;   // the panel's HTML is written once, then fed state
+
+let speaking = true;      // whether to read each stop out loud
+let voice = null;         // the running speech process, if any
+let voiceText = '';       // what it is saying, so a reload does not restart it
+let saidTitle = false;    // the tour's own title is announced once, not per stop
 
 let dim;        // everything outside the focus
 let spot;       // the focused lines
@@ -41,6 +47,103 @@ function loadTour() {
     // the author with. Keep what we have and try again on the next change.
     return tour.steps.length > 0;
   }
+}
+
+const BASE_WPM = 180;   // also holdMs's assumed reading pace, so estimates agree
+
+function cfg(key, fallback) {
+  return vscode.workspace.getConfiguration('docent').get(key, fallback);
+}
+
+// The title and the narration, which is what the panel puts on screen. Claims
+// stay on the page: an evidence class read out loud is noise, not a sentence.
+function speechText(step) {
+  const parts = [];
+  if (step.title) parts.push(step.title);
+  if (step.narration) parts.push(step.narration);
+  return parts.join('. ')
+    // A voice says ensureStream as one slurred word, so the case boundary
+    // becomes a space. Markdown ticks are read out as characters.
+    .replace(/[`*_]/g, '')
+    .replace(/([a-z0-9])([A-Z])/g, '$1 $2')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+// spawn gets an argument array and no shell, so text from a tour cannot become
+// a command. Returns null where the platform has no voice we can drive.
+function speechArgs(text) {
+  if (process.platform === 'darwin') {
+    const v = cfg('voice', '');
+    const flags = (v ? ['-v', v] : []).concat(['-r', String(Math.round(BASE_WPM * speed))]);
+    return ['say', flags.concat(['--', text])];
+  }
+  if (process.platform === 'linux') {
+    const rate = Math.max(-100, Math.min(100, Math.round((speed - 1) * 50)));
+    return ['spd-say', ['-r', String(rate), '-w', '--', text]];
+  }
+  return null;
+}
+
+function stopSpeaking() {
+  if (!voice) return;
+  const v = voice;
+  voice = null;
+  voiceText = '';
+  v.kill();
+}
+
+// Calls done(spoke) once. spoke is false when there was nothing to say or no
+// voice to say it with, which is the caller's cue to fall back to the timer.
+function speak(step, done) {
+  const text = speaking ? speechText(step) : '';
+  // The walk rewrites the tour while it plays, and a reload should not restart
+  // a sentence that has not changed. The running voice keeps its own callback.
+  if (voice && text && text === voiceText) return;
+  stopSpeaking();
+  let spoken = text;
+  if (text && !saidTitle && tour.title) {
+    spoken = `${tour.title}. ${text}`;
+    saidTitle = true;
+  }
+  const args = spoken ? speechArgs(spoken) : null;
+  if (!args) { done(false); return; }
+
+  let child;
+  try {
+    child = spawn(args[0], args[1]);
+  } catch (e) {
+    speaking = false;
+    done(false);
+    return;
+  }
+  voice = child;
+  voiceText = text;   // the step alone, not the announced tour title
+  let settled = false;
+  const settle = (spoke) => {
+    if (settled) return;
+    settled = true;
+    if (voice === child) voice = null;
+    done(spoke);
+  };
+  child.on('error', () => {
+    // No such command on this machine. Stop trying for the rest of the session
+    // rather than sitting in silence at every stop.
+    speaking = false;
+    vscode.window.showWarningMessage(
+      `Docent: ${args[0]} is not available, so stops will not be read out loud`);
+    push();
+    settle(false);
+  });
+  // A killed process closes too, but only the current one advances the tour.
+  child.on('close', () => { if (voice === child) settle(true); });
+}
+
+// A beat after the voice stops, so the eye can finish the lines it was talking
+// about before the tour moves on.
+function tailMs(step) {
+  const lines = step.focus ? step.focus[1] - step.focus[0] + 1 : 1;
+  return Math.min(6000, lines * 400) / speed;
 }
 
 // How long a step is held. Reading is the constraint, so it scales with how
@@ -130,7 +233,7 @@ function push() {
   const step = tour.steps[index] || {};
   panel.webview.postMessage({
     type: 'state',
-    index, total: tour.steps.length, playing, speed,
+    index, total: tour.steps.length, playing, speed, speaking,
     remaining: remainingMinutes(),
     titles: tour.steps.map((s) => s.title || ''),
     files: tour.steps.map((s) => path.basename(s.file || '')),
@@ -225,6 +328,7 @@ function chrome() {
     <option value="0.5">0.5x</option><option value="1" selected>1x</option>
     <option value="2">2x</option><option value="4">4x</option>
   </select>
+  <button id="voice" title="read each stop out loud">&#128266;</button>
   <span id="left"></span>
 </div>
 <div id="seek"></div>
@@ -244,6 +348,7 @@ $('play').onclick = () => vs.postMessage({type:'toggle'});
 $('next').onclick = () => vs.postMessage({type:'next'});
 $('prev').onclick = () => vs.postMessage({type:'prev'});
 $('speed').onchange = (e) => vs.postMessage({type:'speed', value: parseFloat(e.target.value)});
+$('voice').onclick = () => vs.postMessage({type:'voice'});
 
 const esc = (s) => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const order = ['tested','executed','read','inferred'];
@@ -253,6 +358,8 @@ window.addEventListener('message', (ev) => {
   if (s.type !== 'state') return;
   $('play').textContent = s.playing ? 'Pause' : 'Play';
   $('speed').value = String(s.speed);
+  $('voice').textContent = s.speaking ? '\u{1F50A}' : '\u{1F507}';
+  $('voice').title = s.speaking ? 'stop reading stops out loud' : 'read each stop out loud';
   $('left').textContent = (s.index+1) + ' of ' + s.total + '  ·  ~' + s.remaining + ' min left';
   $('prev').disabled = s.index === 0;
   $('next').disabled = s.index >= s.total - 1;
@@ -406,18 +513,29 @@ function updateStatus() {
   status.show();
 }
 
+async function advance() {
+  if (index < tour.steps.length - 1) { index++; await render(); schedule(); }
+  else { playing = false; stopSpeaking(); push(); }
+}
+
+// When a stop is read out loud, the voice sets the pace: the step ends when the
+// sentence does, so nothing is cut off and no step sits in silence. Without a
+// voice the word count is all there is to go on.
 function schedule() {
   clearTimeout(timer);
   if (!playing || !tour.steps[index]) return;
-  timer = setTimeout(async () => {
-    if (index < tour.steps.length - 1) { index++; await render(); schedule(); }
-    else { playing = false; push(); }
-  }, holdMs(tour.steps[index]));
+  const step = tour.steps[index];
+  const at = index;
+  speak(step, (spoke) => {
+    if (!playing || index !== at) return;
+    timer = setTimeout(advance, spoke ? tailMs(step) : holdMs(step));
+  });
 }
 
 function setPlaying(on) {
   playing = on;
   clearTimeout(timer);
+  if (!on) stopSpeaking();
   push();
   if (on) schedule();
 }
@@ -426,7 +544,11 @@ async function goto(i) {
   if (i < 0 || i >= tour.steps.length) return;
   index = i;
   await render();
-  if (playing) schedule();
+  if (playing) { schedule(); return; }
+  // Stepping by hand while paused still reads the stop, because listening to
+  // one stop and staying on it is the whole point of stepping by hand.
+  stopSpeaking();
+  speak(tour.steps[index], () => {});
 }
 
 let selfWrite = false;
@@ -469,6 +591,16 @@ function applyEdit(m) {
   vscode.window.setStatusBarMessage('Docent: saved to tour.json', 1500);
 }
 
+// Turning the voice off stops the sentence in progress. Turning it on starts
+// reading the stop you are already on rather than waiting for the next one.
+function toggleVoice() {
+  speaking = !speaking;
+  stopSpeaking();
+  if (playing) schedule();
+  else if (speaking && tour.steps[index]) speak(tour.steps[index], () => {});
+  push();
+}
+
 async function openPanel() {
   if (panel) { panel.reveal(vscode.ViewColumn.Two, true); return; }
   panel = vscode.window.createWebviewPanel(
@@ -484,6 +616,7 @@ async function openPanel() {
     else if (m.type === 'prev') await goto(index - 1);
     else if (m.type === 'seek') await goto(m.index);
     else if (m.type === 'speed') { speed = m.value; setPlaying(playing); }
+    else if (m.type === 'voice') toggleVoice();
     else if (m.type === 'edit') { setPlaying(false); applyEdit(m); }
     else if (m.type === 'reveal') {
       const p = tourPath();
@@ -492,11 +625,12 @@ async function openPanel() {
   });
   panel.onDidDispose(() => {
     panel = null; chromeSent = false; playing = false;
-    clearTimeout(timer); updateStatus();
+    clearTimeout(timer); stopSpeaking(); updateStatus();
   });
 }
 
 async function start() {
+  saidTitle = false;
   if (!loadTour() || !tour.steps.length) {
     vscode.window.showWarningMessage('Docent: no .docent/tour.json in this workspace');
     return;
@@ -521,6 +655,7 @@ function activate(context) {
     },
   });
   status = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 100);
+  speaking = cfg('speak', true);
 
   const r = root();
   if (r) {
@@ -558,10 +693,11 @@ function activate(context) {
   cmd('docent.prev', () => goto(index - 1));
   cmd('docent.faster', () => { speed = Math.min(4, speed * 2); setPlaying(playing); });
   cmd('docent.slower', () => { speed = Math.max(0.5, speed / 2); setPlaying(playing); });
+  cmd('docent.voice', toggleVoice);
 
   context.subscriptions.push(status, dim, spot, cursorLine);
 }
 
-function deactivate() { clearTimeout(timer); }
+function deactivate() { clearTimeout(timer); stopSpeaking(); }
 
 module.exports = { activate, deactivate };

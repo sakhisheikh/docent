@@ -2,4 +2,5 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 for t in facts_test.sh progress_test.sh annotate_test.sh plugin_test.sh; do ./"$t"; done
+node voice_test.js
 echo "all tests passed"

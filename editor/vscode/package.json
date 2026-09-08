@@ -2,7 +2,7 @@
   "name": "docent",
   "displayName": "Docent",
   "description": "Plays an editable code tour committed to a branch: the editor scrolls itself, spotlights what is being discussed, and narrates beside it",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "publisher": "sakhisheikh",
   "license": "MIT",
   "engines": {
@@ -44,6 +44,10 @@
       {
         "command": "docent.slower",
         "title": "Docent: slower"
+      },
+      {
+        "command": "docent.voice",
+        "title": "Docent: read stops out loud, on or off"
       }
     ],
     "keybindings": [
@@ -72,7 +76,27 @@
         "command": "docent.slower",
         "key": "ctrl+alt+-",
         "mac": "ctrl+alt+-"
+      },
+      {
+        "command": "docent.voice",
+        "key": "ctrl+alt+v",
+        "mac": "ctrl+alt+v"
       }
-    ]
+    ],
+    "configuration": {
+      "title": "Docent",
+      "properties": {
+        "docent.speak": {
+          "type": "boolean",
+          "default": true,
+          "description": "Read each stop's title and narration out loud, so the code can be read while listening. macOS uses say, Linux uses spd-say, and Windows has no voice yet."
+        },
+        "docent.voice": {
+          "type": "string",
+          "default": "",
+          "description": "Which system voice to use, empty for the default. macOS only; say -v '?' lists them."
+        }
+      }
+    }
   }
 }

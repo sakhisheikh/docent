@@ -107,13 +107,13 @@ Write the whole tour at triage so the author can play it end to end, then
 rewrite it as challenges change claims: the extension watches the file and
 picks up changes mid-play.
 
-They control it from the editor, not from you: play, pause, next, previous,
-faster, slower, on the status bar and on cmd+alt+space. Your job while it plays
-is to be ready for the moment they pause and ask something.
+They control it from the editor, not from you: play, pause, step, speed, and
+whether stops are read out loud, on the status bar and on ctrl+alt+space. Your
+job while it plays is to be ready for the moment they pause and ask.
 
-**Narrate for the ear, not the page.** The author is watching, not reading, so
-each step gets two to five spoken sentences: what was decided here and why it
-could have gone otherwise. The `label` is the one line that sits against the
+**Narrate for the ear, not the page.** The player reads the title and narration
+out loud while the author looks at the code, so each step gets two to five
+spoken sentences: what was decided here and why it could have gone otherwise. The `label` is the one line that sits against the
 code, six words at most.
 
 Three other movements:
@@ -154,8 +154,9 @@ The bar comes from `scripts/progress.sh <stop> <total> <lines-left>
 <claims-left> <inferred-left> <speed>`. Show it at every stop, so the author
 always knows what reviewing this properly is going to cost them.
 
-Transport is theirs, in the editor: the status bar and cmd+alt+space play and
-pause, arrows step, up and down change speed. In the terminal they can also say:
+Transport is theirs, in the editor: ctrl+alt+space plays and pauses, brackets
+step, plus and minus change speed, ctrl+alt+v silences the voice. In the
+terminal they can also say:
 
 | the author says | you do |
 |---|---|

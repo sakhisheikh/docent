@@ -65,4 +65,10 @@ grep -q "enableScripts: true" "$ext" || fail "webview scripts disabled, transpor
 grep -q "acquireVsCodeApi" "$ext"    || fail "webview never acquires the api"
 grep -q "docent.play" editor/vscode/package.json || fail "play command not contributed"
 
+# A tour is repo content, so its text must never be parsed as a shell command
+# or as an option to the speech binary.
+grep -qE "spawn\(.*shell" "$ext" && fail "speech must not run through a shell"
+grep -q "'--', text" "$ext" || fail "speech text must follow -- so a leading dash stays text"
+grep -q "docent.voice" editor/vscode/package.json || fail "voice toggle not contributed"
+
 echo "ok: plugin_test"
