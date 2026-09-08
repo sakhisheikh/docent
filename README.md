@@ -124,29 +124,6 @@ of links someone skims. A tour is the review, handed over.
 
 Only `state.json` is gitignored, being your own progress.
 
-## Why the evidence classes exist
-
-Built the day after an AI wrote 3,300 lines across two pull requests that the
-author had not read. Making them reviewable by hand produced the reading orders
-and diagrams docent now generates.
-
-It also produced five confident, wrong claims: a protocol name asserted from a
-log line, a fix described as working that had never been run, a causal
-explanation that was exactly backwards. Every one was caught only because a
-human pushed back.
-
-Docent assumes nobody will. So it grades its own claims, defaults downward, and
-makes "I could not verify this" a first-class output rather than an admission.
-
-## What is proven and what is not
-
-- **The player works.** Play, seek, spotlight, drift-following, speech, and
-  edits saved back to `tour.json`. Covered by tests, used daily.
-- **Triage works.** On a 1,754 line change it picked the same five stops two
-  people had picked by hand over an afternoon, three at the exact line, in 59s.
-- **A generated tour is unproven.** Every tour played so far was written by
-  hand. See [CONTRIBUTING.md](CONTRIBUTING.md).
-
 ## Requirements
 
 Claude Code, git, a repo, and VS Code 1.80+ for the player. GitHub remotes get
